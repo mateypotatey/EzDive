@@ -1,0 +1,7 @@
+You now have a self-contained environment ready for writing Flask code. 
+VS Code activates the environment automatically when you use Terminal: Create New Terminal. 
+If you open a separate command prompt or terminal, activate the environment by 
+running source .venv/bin/activate (Linux/macOS
+
+
+python -m flask run,

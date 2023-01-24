@@ -1,0 +1,30 @@
+{% extends "template.html" %}
+{% block title %} Home {% endblock %}
+{% block body %}
+
+<div>
+    <h2>Welcome back, {{ user }}</h2>
+</div>
+<div>
+    <table>
+        <tr>
+          <th>Dive Number</th>
+          <th>Date</th>
+          <th>Location</th>
+          <th>Max Depth</th>
+          <th>Dive Time</th>
+          <th>Buddy</th>
+        </tr>
+        {% for dive in dive_log %}
+        <tr>
+          <td>{{dive.log_number}}</td>
+          <td>{{dive.dive_date}}</td>
+          <td>{{dive.dive_location}}</td>
+          <td>{{dive.max_depth}}</td>
+          <td>{{dive.dive_time}}</td>
+          <td>{{dive.buddy}}</td>
+        </tr>
+        {% endfor %}
+      </table> 
+</div>
+{% endblock %}

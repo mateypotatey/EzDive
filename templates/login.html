@@ -1,0 +1,13 @@
+{% extends "template.html" %}
+{% block title %} Login {% endblock %}
+{% block body %}
+        <h1>Login Page</h1>
+        <p></p>
+            <form action="/login" method="post">
+                <input autocomplete="off" autofocus class="form-control mx-auto w-auto" id="username" name="username" placeholder="Username" type="text">
+                <input autocomplete="off" class="form-control mx-auto w-auto" id="password" name="password" placeholder="Password" type="password">
+                <button type="submit">Login</button>
+            </form>
+            Don't have an account? Click <a href="/register">here</a> to register.
+
+{% endblock %}
