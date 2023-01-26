@@ -137,10 +137,12 @@ def index():
             print(f"Error encountered: {e}")
         print()"""
 
+
+    #TODO
+    """Need to write a function to get user data more easily. Like so I don't have to keep calling lines 140 to lines 150 whenever someone goes back to the main page."""
+    
     current_user = cursor.execute("SELECT * FROM users WHERE user_id = ?", (session["user_id"],)).fetchone()
     dive_log = cursor.execute("SELECT * FROM entries WHERE diver_id = ?", (session["user_id"],)).fetchall()
-    print(current_user)
-    print(dive_log)
     
     #Below code changes 'None' in database to an empty string for better visualisation in HTML
     for dive_entry in dive_log:
@@ -155,6 +157,10 @@ def index():
 @app.route("/new", methods=["GET", "POST"])
 @login_required
 def new_entry():
+
+
+    current_user = cursor.execute("SELECT * FROM users WHERE user_id = ?", (session["user_id"],)).fetchone()
+
     if request.method == "POST":
         date = request.form.get("date")
         location = request.form.get("location")
@@ -163,7 +169,6 @@ def new_entry():
         max_depth = request.form.get("max_depth")
         avg_depth = request.form.get("avg_depth")
         visibility = request.form.get("visibility")
-        deco_dive = request.form.get("deco")
         tank_type = request.form.get("tank_type")
         in_pressure = request.form.get("in_pressure")
         out_pressure = request.form.get("out_pressure")
@@ -176,8 +181,20 @@ def new_entry():
         buddy = request.form.get("buddy")
         dive_notes = request.form.get("notes")
 
-        dive_entry = [date, location, time_in, dive_time, max_depth, avg_depth, visibility, deco_dive, tank_type, in_pressure, out_pressure, water_temp, 
-            lead_weight, suit_type, hood, wetsuit_thickness, ds_undergarment, buddy, dive_notes]
+        dive_entry = [date, location, time_in, dive_time, max_depth, avg_depth, visibility, tank_type, in_pressure, out_pressure, water_temp, 
+            lead_weight, suit_type, hood, wetsuit_thickness, ds_undergarment, buddy, dive_notes, session["user_id"]]
+        
+        cursor.execute("INSERT INTO entries"
+                       "(dive_date, dive_location, time_in, dive_time, max_depth, avg_depth,"
+                       "visibility, tank_type, in_pressure, out_pressure, water_temp, lead_weight,"
+                       "suit_type, hood, wetsuit_thickness, ds_undergarment, buddy, dive_notes, diver_id)"
+                       "VALUES"
+                       "(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", dive_entry)
+        
+        return render_template("index.html", user=current_user["username"], )
+
+        
+    return render_template("new.html")
 
 
 @app.route("/login", methods=["GET", "POST"])
