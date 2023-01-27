@@ -6,8 +6,11 @@
             <form action="/login" method="post">
                 <input autocomplete="off" autofocus class="form-control mx-auto w-auto" id="username" name="username" placeholder="Username" type="text">
                 <input autocomplete="off" class="form-control mx-auto w-auto" id="password" name="password" placeholder="Password" type="password">
-                <button type="submit">Login</button>
+                <button class="form-control mx-auto w-auto" type="submit">Login</button>
             </form>
-            Don't have an account? Click <a href="/register">here</a> to register.
+            <h4>Don't have an account? Click <a href="/register">here</a> to register.</h4>
+            <p></p>
+            <h4>There are currently {{ total_users }} registered users with a total number of {{ logged_dives }} logged dives.</h4>
+
 
 {% endblock %}

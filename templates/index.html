@@ -3,8 +3,9 @@
 {% block body %}
 
 <div>
-    <h2>Welcome back, {{ user }}</h2>
+    <h1>Welcome back, {{ user }}</h1>
 </div>
+<div>You have logged {{dive_count}} dives.</div>
 <div>
     <table>
         <tr>
@@ -17,7 +18,7 @@
         </tr>
         {% for dive in dive_log %}
         <tr>
-          <td>{{dive.log_number}}</td>
+          <td>{{dive.dive_number}}</td>
           <td>{{dive.dive_date}}</td>
           <td>{{dive.dive_location}}</td>
           <td>{{dive.max_depth}}</td>

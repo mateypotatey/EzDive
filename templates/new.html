@@ -4,8 +4,9 @@
 <h1>New Log Entry</h1>
 <p></p>
     <form action="/new" method="post">
+        <h4>Dive number: {{dive_count}}</h4>
         <input class="form-control mx-auto w-auto"type="date" id="date" name="date">
-        <input autocomplete="off" class="form-control mx-auto w-auto" id="location" name="location" placeholder="Dive Location" type="text">
+        <input class="form-control mx-auto w-auto" id="location" name="location" placeholder="Dive Location" type="text">
         <h4>Time in: (24h and 12h both work)</h4> <input class="form-control mx-auto w-auto"id="time_in" name="time_in" type="time">
         <input autocomplete="off" class="form-control mx-auto smallText" id="dive_time" name="dive_time" placeholder="Dive Time (minutes)" type="number" min="0">
         <input autocomplete="off" class="form-control mx-auto smallText" id="max_depth" name="max_depth" placeholder="Max Depth" type="number" min="0">
@@ -31,8 +32,8 @@
         </select>
         <input autocomplete="off" class="form-control mx-auto smallText" id="wetsuit_thickness" name="wetsuit_thickness" placeholder="Wetsuit Thickness" type="number" min="0">
         <input autocomplete="off" class="form-control mx-auto smallText" id="hood" name="hood" placeholder="Hood Thickness" type="number" min="0">
-        <input autocomplete="off" class="form-control mx-auto w-auto" id="ds_undergarment" name="ds_undergarment" placeholder="Drysuit undergarment" type="text">
-        <input autocomplete="off" class="form-control mx-auto w-auto" id="buddy" name="buddy" placeholder="Buddy" type="text">
+        <input class="form-control mx-auto w-auto" id="ds_undergarment" name="ds_undergarment" placeholder="Drysuit undergarment" type="text">
+        <input class="form-control mx-auto w-auto" id="buddy" name="buddy" placeholder="Buddy" type="text">
         <textarea name="notes" autocomplete="off" id="notes" placeholder="General Notes" class="myNotes form-control mx-auto"></textarea>
         <button class="form-control mx-auto w-auto" type="submit">Submit</button>
     </form>
