@@ -60,7 +60,6 @@ def sql_select(query, user = None):
             cursor = connection.cursor()
             if user != None:
                 current_user = cursor.execute(query, user)
-                print("Query executed successfully")
                 return current_user
             else:
                 current_user = cursor.execute(query)
@@ -77,7 +76,33 @@ def sql_insert(query, dive_log_entry):
             cursor = connection.cursor()
             cursor.execute(query, dive_log_entry)
             connection.commit()
-            print("Query executed successfully")
             return
     except Error as e:
         print(f"Error encountered: {e}")
+
+#For updating the dive log
+def sql_update(query, dive_log_entry, log_number):
+    try:
+        with sqlite3.connect("ezdive.db") as connection:
+            connection.row_factory = dict_factory
+            cursor = connection.cursor()
+            cursor.execute(query, dive_log_entry, log_number)
+            connection.commit()
+            return
+    except Error as e:
+        print(f"Error encountered with updating database: {e}")
+
+
+#Check dive number
+"""This function checks if the last dive log entry was a number or text (like 'Training dive'). 
+If the last log entry was a number, it just auto-increments to the next number. If it was text, 
+it recurses back to check the last 'legitimate' log entry and auto-increments from there."""
+def next_dive_number(dive_log_entry, idx):
+    try:
+        last_dive = dive_log_entry[idx]["dive_number"]
+        last_dive = int(last_dive)
+        return last_dive + 1
+    
+    except ValueError or TypeError:
+        return next_dive_number(dive_log_entry, idx-1)
+    

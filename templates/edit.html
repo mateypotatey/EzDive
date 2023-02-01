@@ -1,0 +1,63 @@
+{% extends "template.html" %}
+{% block title %} Edit a log entry {% endblock %}
+{% block head %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+        //need to include this to escape a number of symbols imported from sql but keep the general text structure intact.
+        //qtab is just a random word i changed \r\n to in python to denote newline
+        function unEscape(htmlStr) {
+            htmlStr = htmlStr.replace(/&lt;/g , "<");	 
+            htmlStr = htmlStr.replace(/&gt;/g , ">");     
+            htmlStr = htmlStr.replace(/&quot;/g , "\"");
+            htmlStr = htmlStr.replace(/&#34;/g, "\"");  
+            htmlStr = htmlStr.replace(/&#39;/g , "\'");   
+            htmlStr = htmlStr.replace(/&amp;/g , "&");
+            htmlStr = htmlStr.replaceAll("qtab", "\n")
+            return htmlStr;
+        }
+        var log_notes = "{{dive_notes}}"
+        log_notes = unEscape(log_notes)
+        document.getElementById("notes").value = log_notes
+});
+</script>
+{% endblock %}
+{% block body %}
+
+<h1>Edit Entry</h1>
+<p></p>
+    <form action="/edit" method="post">
+        <h4>Dive number: {{entry.dive_number}}</h4>
+        <input class="form-control mx-auto w-auto" id="dive_number" name="dive_number" value="{{entry.dive_number}}" type="text">
+        <input class="form-control mx-auto w-auto"type="date" id="date" name="date" value="{{entry.dive_date}}">
+        <input class="form-control mx-auto w-auto" id="location" name="location" value="{{entry.dive_location}}" type="text">
+        <h4>Time in: (24h and 12h both work)</h4> <input class="form-control mx-auto w-auto"id="time_in" name="time_in" type="time" value="{{entry.time_in}}">
+        <input autocomplete="off" class="form-control mx-auto smallText" id="dive_time" name="dive_time" value="{{entry.dive_time}}" type="number" min="0">
+        <input autocomplete="off" class="form-control mx-auto smallText" id="max_depth" name="max_depth" value="{{entry.max_depth}}" type="number" min="0">
+        <input autocomplete="off" class="form-control mx-auto smallText" id="avg_depth" name="avg_depth" value="{{entry.avg_depth}}" type="number" min="0">
+        <input autocomplete="off" class="form-control mx-auto smallText" id="visibility" name="visibility" value="{{entry.visibility}}" type="number" min="0">
+        <select name="tank_type" id="tank_type" class="form-control mx-auto w-auto">
+            <option value="{{entry.tank_type}}" selected>{{entry.tank_type}}</option>
+            <option value="ali80">Aluminium 80 (11.1L)</option>
+            <option value="steel12">Steel 12L</option>
+            <option value="steel15">Steel 15L</option>
+            <option value="dbl12">Double 12</option>
+            <option value="dbl_al80">Double Ali 80</option>
+        </select>
+        <h4>Tank pressures:</h4>
+        <input autocomplete="off" class="form-control mx-auto smallText" id="in_pressure" name="in_pressure" value="{{entry.in_pressure}}" type="number" min="0">
+        <input autocomplete="off" class="form-control mx-auto smallText" id="out_pressure" name="out_pressure" value="{{entry.out_pressure}}" type="number" min="0">
+        <input autocomplete="off" class="form-control mx-auto smallText" id="water_temp" name="water_temp" value="{{entry.water_temp}}" type="number" min="0">
+        <input autocomplete="off" class="form-control mx-auto smallText" id="lead_weight" name="lead_weight" value="{{entry.lead_weight}}" type="number" min="0" step="0.5">
+        <select name="suit_type" id="suit_type" class="form-control mx-auto w-auto">
+            <option value="{{entry.suit_type}}" selected>{{entry.suit_type}}</option>
+            <option value="dry">Dry</option>
+            <option value="wet">Wet</option>
+        </select>
+        <input autocomplete="off" class="form-control mx-auto smallText" id="wetsuit_thickness" name="wetsuit_thickness" value="{{entry.wetsuit_thickness}}" type="number" min="0">
+        <input autocomplete="off" class="form-control mx-auto smallText" id="hood" name="hood" value="{{entry.hood}}" type="number" min="0">
+        <input class="form-control mx-auto w-auto" id="ds_undergarment" name="ds_undergarment" value="{{entry.ds_undergarment}}" type="text">
+        <input class="form-control mx-auto w-auto" id="buddy" name="buddy" value="{{entry.buddy}}" type="text">
+        <textarea name="notes" autocomplete="off" id="notes" class="myNotes form-control mx-auto"></textarea>
+        <button class="form-control mx-auto w-auto" type="submit">Submit</button>
+    </form>
+{% endblock %}

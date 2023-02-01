@@ -3,7 +3,7 @@ from flask_session import Session
 from werkzeug.security import check_password_hash, generate_password_hash
 import sqlite3
 from sqlite3 import Error
-from helpers import check_entry_validity, login_required, apology, sql_select, sql_insert
+from helpers import check_entry_validity, login_required, apology, sql_select, sql_insert, sql_update, next_dive_number
 
 app = Flask(__name__)
 
@@ -39,13 +39,13 @@ def after_request(response):
 @login_required
 def index():
      
-    
     current_user = sql_select("SELECT * FROM users WHERE user_id = ?", (session["user_id"],)).fetchone()
     dive_log = sql_select("SELECT * FROM entries WHERE diver_id = ?", (session["user_id"],)).fetchall()
     
     dive_count = len(dive_log)
-    
+        
     return render_template("index.html", user=current_user["username"], dive_log=dive_log, dive_count=dive_count)
+
 
 @app.route("/new", methods=["GET", "POST"])
 @login_required
@@ -53,10 +53,15 @@ def new_entry():
 
     current_user = sql_select("SELECT * FROM users WHERE user_id = ?", (session["user_id"],)).fetchone()
     dive_log = sql_select("SELECT * FROM entries WHERE diver_id = ?", (session["user_id"],)).fetchall()
+  
+    dive_count = len(dive_log)
+    idx = -1
 
-    dive_count = len(dive_log) + 1
+    #Auto-incrementing dive number to correct number
+    next_dive = (next_dive_number(dive_log, idx))
 
     if request.method == "POST":
+        dive_number = request.form.get("dive_number")
         date = request.form.get("date")
         location = request.form.get("location")
         time_in = request.form.get("time_in")
@@ -76,9 +81,10 @@ def new_entry():
         buddy = request.form.get("buddy")
         dive_notes = request.form.get("notes")
 
-        dive_entry = [dive_count, date, location, time_in, dive_time, max_depth, avg_depth, visibility, tank_type, in_pressure, out_pressure, water_temp, 
+        dive_entry = [dive_number, date, location, time_in, dive_time, max_depth, avg_depth, visibility, tank_type, in_pressure, out_pressure, water_temp, 
             lead_weight, suit_type, hood, wetsuit_thickness, ds_undergarment, buddy, dive_notes, session["user_id"]]
         
+
         #Check to see if anything was entered. Return error message if all fields were left blank.
         if check_entry_validity(dive_entry) == False:
             return apology("You need to fill out something for the dive to count!")
@@ -93,8 +99,69 @@ def new_entry():
         
         return redirect("/")
         
-    return render_template("new.html", dive_count=dive_count)
+    return render_template("new.html", dive_count=dive_count, next_dive=next_dive)
 
+
+@app.route("/editButton", methods=["POST"])
+@login_required
+def editBtn():
+
+    dive_id = request.form.get("id")
+
+    #making dive_log global so it can be called again in /edit route
+    global dive_log
+    dive_log = dive_id
+
+    entry = sql_select("SELECT * FROM entries WHERE diver_id = ? AND log_id = ?", (session["user_id"], dive_log)).fetchone()
+    dive_notes = entry["dive_notes"]
+
+    #The below in conjuction with edit.html javascript fixes the "javascript throws a Uncaught SyntaxError: "
+    #" string literal contains an unescaped line break error" because it's reading newline characters from sql.
+    dive_notes = dive_notes.replace("\r\n", "qtab")
+
+    return render_template("/edit.html", entry=entry, dive_notes=dive_notes)
+
+
+@app.route("/edit", methods=["POST"])
+@login_required
+def edit():
+
+    #Modify the existing entry using newly entered values. Update using the global dive_log number set above
+    dive_number = request.form.get("dive_number")
+    date = request.form.get("date")
+    location = request.form.get("location")
+    time_in = request.form.get("time_in")
+    dive_time = request.form.get("dive_time")
+    max_depth = request.form.get("max_depth")
+    avg_depth = request.form.get("avg_depth")
+    visibility = request.form.get("visibility")
+    tank_type = request.form.get("tank_type")
+    in_pressure = request.form.get("in_pressure")
+    out_pressure = request.form.get("out_pressure")
+    water_temp = request.form.get("water_temp")
+    lead_weight = request.form.get("lead")
+    suit_type = request.form.get("suit_type")
+    hood = request.form.get("hood")
+    wetsuit_thickness = request.form.get("thickness")
+    ds_undergarment = request.form.get("undergarment")
+    buddy = request.form.get("buddy")
+    dive_notes = request.form.get("notes")
+
+    dive_entry = [dive_number, date, location, time_in, dive_time, max_depth, avg_depth, visibility, tank_type, in_pressure, out_pressure, water_temp, 
+        lead_weight, suit_type, hood, wetsuit_thickness, ds_undergarment, buddy, dive_notes, session["user_id"], dive_log]    
+
+     #Check to see if anything was entered. Return error message if all fields were left blank.
+    if check_entry_validity(dive_entry) == False:
+        return apology("You need to fill out something for the dive to count!")
+
+    #insert the new entry into the database
+    sql_insert("UPDATE entries SET "
+                    "dive_number = ?, dive_date = ?, dive_location = ?, time_in = ?, dive_time = ?, max_depth = ?, avg_depth = ?,"
+                    "visibility = ?, tank_type = ?, in_pressure = ?, out_pressure = ?, water_temp = ?, lead_weight = ?,"
+                    "suit_type = ?, hood = ?, wetsuit_thickness = ?, ds_undergarment = ?, buddy = ?, dive_notes = ?, diver_id = ?"
+                    "WHERE log_id = ?", (dive_entry))
+    
+    return redirect("/")
 
 @app.route("/login", methods=["GET", "POST"])
 def login():

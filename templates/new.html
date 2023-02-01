@@ -4,7 +4,8 @@
 <h1>New Log Entry</h1>
 <p></p>
     <form action="/new" method="post">
-        <h4>Dive number: {{dive_count}}</h4>
+        <h4>Current number of log entries: {{dive_count}}</h4>
+        <h4>Next dive name/log number: </h4><input class="form-control mx-auto w-auto" id="dive_number" name="dive_number" value="{{next_dive}}" type="text">
         <input class="form-control mx-auto w-auto"type="date" id="date" name="date">
         <input class="form-control mx-auto w-auto" id="location" name="location" placeholder="Dive Location" type="text">
         <h4>Time in: (24h and 12h both work)</h4> <input class="form-control mx-auto w-auto"id="time_in" name="time_in" type="time">

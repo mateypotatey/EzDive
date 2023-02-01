@@ -15,6 +15,7 @@
           <th>Max Depth</th>
           <th>Dive Time</th>
           <th>Buddy</th>
+          <th></th>
         </tr>
         {% for dive in dive_log %}
         <tr>
@@ -24,6 +25,12 @@
           <td>{{dive.max_depth}}</td>
           <td>{{dive.dive_time}}</td>
           <td>{{dive.buddy}}</td>
+          <td>
+            <form action="/editButton" method="post">
+                <input name="id" type="hidden" value="{{ dive.log_id }}">
+                <input type="submit" value="Edit/Delete">
+            </form>
+        </td>
         </tr>
         {% endfor %}
       </table> 
