@@ -26,9 +26,9 @@
           <td>{{dive.dive_time}}</td>
           <td>{{dive.buddy}}</td>
           <td>
-            <form action="/editButton" method="post">
+            <form action="/view" method="post">
                 <input name="id" type="hidden" value="{{ dive.log_id }}">
-                <input type="submit" value="Edit/Delete">
+                <input type="submit" value="View">
             </form>
         </td>
         </tr>

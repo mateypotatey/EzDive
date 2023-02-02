@@ -46,6 +46,15 @@ def index():
         
     return render_template("index.html", user=current_user["username"], dive_log=dive_log, dive_count=dive_count)
 
+@app.route("/view", methods=["POST"])
+@login_required
+def view():
+    dive_id = request.form.get("id")
+    dive_log = sql_select("SELECT * FROM entries WHERE log_id = ?", (dive_id,)).fetchone()
+    print(dive_log)
+
+    return render_template("entry.html", dive_log = dive_log)
+
 
 @app.route("/new", methods=["GET", "POST"])
 @login_required
@@ -55,10 +64,9 @@ def new_entry():
     dive_log = sql_select("SELECT * FROM entries WHERE diver_id = ?", (session["user_id"],)).fetchall()
   
     dive_count = len(dive_log)
-    idx = -1
 
-    #Auto-incrementing dive number to correct number
-    next_dive = (next_dive_number(dive_log, idx))
+    #Auto-incrementing dive number to 'official' dive number
+    next_dive = (next_dive_number(dive_log, idx = -1))
 
     if request.method == "POST":
         dive_number = request.form.get("dive_number")
@@ -147,10 +155,14 @@ def edit():
     buddy = request.form.get("buddy")
     dive_notes = request.form.get("notes")
 
+    #TODO: Changing the undergarment shows up as none, even when something is entered. Does it have to do with None value in SQL?
+    #Looks like even adding a new entry and adding values to drysuit undergarment, lead weight and wetsuit thickness does nothing.
+    print(ds_undergarment)
+
     dive_entry = [dive_number, date, location, time_in, dive_time, max_depth, avg_depth, visibility, tank_type, in_pressure, out_pressure, water_temp, 
         lead_weight, suit_type, hood, wetsuit_thickness, ds_undergarment, buddy, dive_notes, session["user_id"], dive_log]    
 
-     #Check to see if anything was entered. Return error message if all fields were left blank.
+    #Check to see if anything was entered. Return error message if all fields were left blank.
     if check_entry_validity(dive_entry) == False:
         return apology("You need to fill out something for the dive to count!")
 

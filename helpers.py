@@ -31,10 +31,11 @@ def login_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
+
 #Function to check if all fields are empty. Returns False if all empty
 def check_entry_validity(dive_entry):
     empty_counter = 0
-    for entry in dive_entry[1:18]:
+    for entry in dive_entry[1:19]:
         if entry == "" or entry==None:
             empty_counter += 1
         else:
@@ -44,6 +45,21 @@ def check_entry_validity(dive_entry):
         return False
     else:
         return True
+
+
+#Check dive number
+"""This function checks if the last dive log entry was a number or text (like 'Training dive'). 
+If the last log entry was a number, it just auto-increments to the next number. If it was text, 
+it recurses back to check the last time the log entry was a number and auto-increments."""
+def next_dive_number(dive_log_entry, idx):
+    try:
+        last_dive = dive_log_entry[idx]["dive_number"]
+        last_dive = int(last_dive)
+        return last_dive + 1
+    
+    except ValueError or TypeError:
+        return next_dive_number(dive_log_entry, idx - 1)
+
 
 """SQL code from here on"""
 #Change sqlite query result tuple to dict.
@@ -92,17 +108,4 @@ def sql_update(query, dive_log_entry, log_number):
     except Error as e:
         print(f"Error encountered with updating database: {e}")
 
-
-#Check dive number
-"""This function checks if the last dive log entry was a number or text (like 'Training dive'). 
-If the last log entry was a number, it just auto-increments to the next number. If it was text, 
-it recurses back to check the last 'legitimate' log entry and auto-increments from there."""
-def next_dive_number(dive_log_entry, idx):
-    try:
-        last_dive = dive_log_entry[idx]["dive_number"]
-        last_dive = int(last_dive)
-        return last_dive + 1
-    
-    except ValueError or TypeError:
-        return next_dive_number(dive_log_entry, idx-1)
     

@@ -1,0 +1,83 @@
+{% extends "template.html" %}
+{% block title %}View Entry{% endblock %}
+{% block body %}
+
+<h4>View Entry</h4>
+<table>
+    <tr>
+        <td><b>Dive: </b></td>
+        <td>{{dive_log["dive_number"]}}</td>
+        <td><b>Tank pressure (start): </b></td>
+        <td>{{dive_log["in_pressure"]}} bar</td>
+    </tr>
+    <tr>
+        <td><b>Date: </b></td>
+        <td>{{dive_log["dive_date"]}}</td>
+        <td><b>Tank pressure (end): </b></td>
+        <td>{{dive_log["out_pressure"]}} bar</td>
+    </tr>
+    <tr>
+        <td><b>Location: </b></td>
+        <td>{{dive_log["dive_location"]}}</td>
+        <td><b>RMV: </b></td>
+        <td>to be calculated</td>
+    </tr>
+    <tr>
+        <td><b>Time in: </b></td>
+        <td>{{dive_log["time_in"]}}</td>
+    </tr>
+    <tr>
+        <td><b>Total Dive Time: </b></td>
+        <td>{{dive_log["dive_time"]}} mins</td>
+    </tr>
+    <tr>
+        <td><b>Max depth: </b></td>
+        <td>{{dive_log["max_depth"]}} metres</td>
+        <td><b>Average depth: </b></td>
+        <td>{{dive_log["avg_depth"]}} metres</td>
+    </tr>
+    <tr>
+        <td><b>Visibility: </b></td>
+        <td>{{dive_log["visibility"]}} metres</td>
+    </tr>
+    <tr>
+        <td><b>Water Temp.: </b></td>
+        <td>{{dive_log["water_temp"]}}</td>
+    </tr>
+    <tr>
+        <td><b>Tank(s): </b></td>
+        <td>{{dive_log["tank_type"]}}</td>
+        <td><b>Hood: </b></td>
+        <td>{{dive_log["hood"]}}</td>
+    </tr>
+    <tr>
+        <td><b>Visibility: </b></td>
+        <td>{{dive_log["visibility"]}}</td>
+        <td><b>Suit type: </b></td>
+        <td>{{dive_log["suit_type"]}}</td>
+        <td>Need to dynamically show this depending on if dry or wet</td>
+    </tr>
+    <tr>
+        <td><b>Visibility: </b></td>
+        <td>{{dive_log["visibility"]}}</td>
+        <td><b>Thickness or Undergarment: </b></td>
+        <td>{{dive_log["wetsuit_thickness"]}}</td>
+    </tr>
+    <tr>
+        <td><b>Buddy: </b></td>
+        <td>{{dive_log["buddy"]}}</td>
+        <td><b>Lead: </b></td>
+        <td>{{dive_log["lead_weight"]}}</td>
+    </tr>
+    <tr>
+        <td><b>Notes: </b></td>
+        <td>{{dive_log["dive_notes"]}}</td>
+    </tr>
+</table>
+
+<form action="/editButton" method="post">
+    <input name="id" type="hidden" value="{{ dive_log.log_id }}">
+    <input type="submit" value="Edit Entry">
+</form>
+{% endblock %}
+
