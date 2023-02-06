@@ -14,7 +14,8 @@
         <title>EzDive - {% block title %}{% endblock %}</title>
         {% block head %}{% endblock %}
     </head>
-    <body>
+    <!--onload="start()" calls a function that's present in different pages to load all the scripts in that page on pageload-->
+    <body onload="start()">
         <a href="/">Home/Logbook</a>
         <a href="/new">New Entry</a>
         <a href="/summary">Summary Stats</a>

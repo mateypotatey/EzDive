@@ -1,5 +1,34 @@
 {% extends "template.html" %}
 {% block title %} Create a new entry {% endblock %}
+{% block head%}
+<script>  
+    function disableTextBox() {  
+    if (document.getElementById("suit_type").value == "none")  
+     
+    {      
+       document.getElementById("wetsuit_thickness").disabled = "true";
+       document.getElementById("ds_undergarment").disabled = "true"; 
+    } 
+    else if (document.getElementById("suit_type").value == "Dry")
+    {  
+        document.getElementById("wetsuit_thickness").disabled = "true"; 
+        document.getElementById("wetsuit_thickness").value = "";
+        document.getElementById("ds_undergarment").disabled = "";
+    }  
+    else if (document.getElementById("suit_type").value == "Wet")
+    {
+        document.getElementById("ds_undergarment").disabled = "true";
+        document.getElementById("ds_undergarment").value = "";
+        document.getElementById("wetsuit_thickness").disabled = "";
+    }
+    }   
+    function start() {
+        disableTextBox();
+    }
+    window.onload = start;
+</script>  
+
+{% endblock %}
 {% block body %}
 <h1>New Log Entry</h1>
 <p></p>
@@ -25,11 +54,11 @@
         <input autocomplete="off" class="form-control mx-auto smallText" id="in_pressure" name="in_pressure" placeholder="In" type="number" min="0">
         <input autocomplete="off" class="form-control mx-auto smallText" id="out_ressure" name="out_pressure" placeholder="Out" type="number" min="0">
         <input autocomplete="off" class="form-control mx-auto smallText" id="water_temp" name="water_temp" placeholder="Water Temp (C)" type="number" min="0">
-        <input autocomplete="off" class="form-control mx-auto smallText" id="leadweight" name="lead_weight" placeholder="Lead in kg" type="number" min="0" step="0.5">
-        <select name="suit_type" id="suit_type" class="form-control mx-auto w-auto">
-            <option value="" selected hidden disabled>Wet or Dry Suit?</option>
-            <option value="dry">Dry</option>
-            <option value="wet">Wet</option>
+        <input autocomplete="off" class="form-control mx-auto smallText" id="lead_weight" name="lead_weight" placeholder="Lead in kg" type="number" min="0" step="0.5">
+        <select name="suit_type" id="suit_type" class="form-control mx-auto w-auto" onChange="disableTextBox();">
+            <option value="none" selected hidden disabled>Wet or Dry Suit?</option>
+            <option value="Dry">Dry</option>
+            <option value="Wet">Wet</option>
         </select>
         <input autocomplete="off" class="form-control mx-auto smallText" id="wetsuit_thickness" name="wetsuit_thickness" placeholder="Wetsuit Thickness" type="number" min="0">
         <input autocomplete="off" class="form-control mx-auto smallText" id="hood" name="hood" placeholder="Hood Thickness" type="number" min="0">

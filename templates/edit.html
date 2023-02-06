@@ -2,7 +2,6 @@
 {% block title %} Edit a log entry {% endblock %}
 {% block head %}
 <script>
-document.addEventListener('DOMContentLoaded', () => {
         //need to include this to escape a number of symbols imported from sql but keep the general text structure intact.
         //qtab is just a random word i changed \r\n to in python to denote newline
         function unEscape(htmlStr) {
@@ -15,10 +14,11 @@ document.addEventListener('DOMContentLoaded', () => {
             htmlStr = htmlStr.replaceAll("qtab", "\n")
             return htmlStr;
         }
-        var log_notes = "{{dive_notes}}"
-        log_notes = unEscape(log_notes)
-        document.getElementById("notes").value = log_notes
-});
+        
+function start() {
+    log_notes = unEscape("{{dive_notes}}");
+    document.getElementById("notes").value = log_notes
+}
 </script>
 {% endblock %}
 {% block body %}
@@ -50,8 +50,8 @@ document.addEventListener('DOMContentLoaded', () => {
         <input autocomplete="off" class="form-control mx-auto smallText" id="lead_weight" name="lead_weight" value="{{entry.lead_weight}}" type="number" min="0" step="0.5">
         <select name="suit_type" id="suit_type" class="form-control mx-auto w-auto">
             <option value="{{entry.suit_type}}" selected>{{entry.suit_type}}</option>
-            <option value="dry">Dry</option>
-            <option value="wet">Wet</option>
+            <option value="Dry">Dry</option>
+            <option value="Wet">Wet</option>
         </select>
         <input autocomplete="off" class="form-control mx-auto smallText" id="wetsuit_thickness" name="wetsuit_thickness" value="{{entry.wetsuit_thickness}}" type="number" min="0">
         <input autocomplete="off" class="form-control mx-auto smallText" id="hood" name="hood" value="{{entry.hood}}" type="number" min="0">

@@ -1,5 +1,39 @@
 {% extends "template.html" %}
 {% block title %}View Entry{% endblock %}
+
+{% block head %}
+<script>
+    function WetOrDry() {
+        if ("{{dive_log['suit_type']}}" == "Dry")
+        {
+            document.getElementById("wetsuit_text").hidden = "true";
+            document.getElementById("wetsuit_data").hidden = "true";
+            document.getElementById("drysuit_text").hidden = "";
+            document.getElementById("drysuit_data").hidden = "";
+        }
+        else if ("{{dive_log['suit_type']}}" == "Wet")
+        {
+            document.getElementById("wetsuit_text").hidden = "";
+            document.getElementById("wetsuit_data").hidden = "";
+            document.getElementById("drysuit_text").hidden = "true";
+            document.getElementById("drysuit_data").hidden = "true";
+        }
+        else 
+        {
+            document.getElementById("wetsuit_text").hidden = "true";
+            document.getElementById("wetsuit_data").hidden = "true";
+            document.getElementById("drysuit_text").hidden = "true";
+            document.getElementById("drysuit_data").hidden = "true";
+        }
+    }
+    function start() {
+        WetOrDry();
+    }
+window.onload = start;
+</script>
+
+{% endblock %}
+
 {% block body %}
 
 <h4>View Entry</h4>
@@ -55,13 +89,14 @@
         <td>{{dive_log["visibility"]}}</td>
         <td><b>Suit type: </b></td>
         <td>{{dive_log["suit_type"]}}</td>
-        <td>Need to dynamically show this depending on if dry or wet</td>
     </tr>
     <tr>
         <td><b>Visibility: </b></td>
         <td>{{dive_log["visibility"]}}</td>
-        <td><b>Thickness or Undergarment: </b></td>
-        <td>{{dive_log["wetsuit_thickness"]}}</td>
+        <td id="wetsuit_text"><b>Wetsuit Thickness: </b></td>
+        <td id="wetsuit_data">{{dive_log["wetsuit_thickness"]}}</td>
+        <td id="drysuit_text"><b>Undergarment: </b></td>
+        <td id="drysuit_data">{{dive_log["ds_undergarment"]}}</td>
     </tr>
     <tr>
         <td><b>Buddy: </b></td>
@@ -71,7 +106,7 @@
     </tr>
     <tr>
         <td><b>Notes: </b></td>
-        <td>{{dive_log["dive_notes"]}}</td>
+        <td>{{dive_log['dive_notes']}}</td>
     </tr>
 </table>
 

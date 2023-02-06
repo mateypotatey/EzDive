@@ -81,13 +81,14 @@ def new_entry():
         in_pressure = request.form.get("in_pressure")
         out_pressure = request.form.get("out_pressure")
         water_temp = request.form.get("water_temp")
-        lead_weight = request.form.get("lead")
+        lead_weight = request.form.get("lead_weight")
         suit_type = request.form.get("suit_type")
         hood = request.form.get("hood")
-        wetsuit_thickness = request.form.get("thickness")
-        ds_undergarment = request.form.get("undergarment")
+        wetsuit_thickness = request.form.get("wetsuit_thickness")
+        ds_undergarment = request.form.get("ds_undergarment")
         buddy = request.form.get("buddy")
         dive_notes = request.form.get("notes")
+        print(lead_weight,wetsuit_thickness,ds_undergarment, hood)
 
         dive_entry = [dive_number, date, location, time_in, dive_time, max_depth, avg_depth, visibility, tank_type, in_pressure, out_pressure, water_temp, 
             lead_weight, suit_type, hood, wetsuit_thickness, ds_undergarment, buddy, dive_notes, session["user_id"]]
@@ -147,11 +148,11 @@ def edit():
     in_pressure = request.form.get("in_pressure")
     out_pressure = request.form.get("out_pressure")
     water_temp = request.form.get("water_temp")
-    lead_weight = request.form.get("lead")
+    lead_weight = request.form.get("lead_weight")
     suit_type = request.form.get("suit_type")
     hood = request.form.get("hood")
-    wetsuit_thickness = request.form.get("thickness")
-    ds_undergarment = request.form.get("undergarment")
+    wetsuit_thickness = request.form.get("wetsuit_thickness")
+    ds_undergarment = request.form.get("ds_undergarment")
     buddy = request.form.get("buddy")
     dive_notes = request.form.get("notes")
 
