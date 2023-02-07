@@ -36,12 +36,10 @@ function start() {
         <input autocomplete="off" class="form-control mx-auto smallText" id="avg_depth" name="avg_depth" value="{{entry.avg_depth}}" type="number" min="0">
         <input autocomplete="off" class="form-control mx-auto smallText" id="visibility" name="visibility" value="{{entry.visibility}}" type="number" min="0">
         <select name="tank_type" id="tank_type" class="form-control mx-auto w-auto">
-            <option value="{{entry.tank_type}}" selected>{{entry.tank_type}}</option>
-            <option value="ali80">Aluminium 80 (11.1L)</option>
-            <option value="steel12">Steel 12L</option>
-            <option value="steel15">Steel 15L</option>
-            <option value="dbl12">Double 12</option>
-            <option value="dbl_al80">Double Ali 80</option>
+            <option value="{{entry.tank_type}}" selected>{{scuba_tanks[entry.tank_type]}}</option>
+            {% for tank in scuba_tanks %}
+                <option value="{{tank}}">{{scuba_tanks[tank]}}</option>
+            {% endfor %}
         </select>
         <h4>Tank pressures:</h4>
         <input autocomplete="off" class="form-control mx-auto smallText" id="in_pressure" name="in_pressure" value="{{entry.in_pressure}}" type="number" min="0">

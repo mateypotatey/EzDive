@@ -11,17 +11,24 @@
     } 
     else if (document.getElementById("suit_type").value == "Dry")
     {  
-        document.getElementById("wetsuit_thickness").disabled = "true"; 
+        document.getElementById("wetsuit_thickness").hidden = "true"; 
+        document.getElementById("wetsuit_text").hidden = "true";
+        document.getElementById("drysuit_text").hidden = "";
+        document.getElementById("ds_undergarment").hidden = "";
         document.getElementById("wetsuit_thickness").value = "";
         document.getElementById("ds_undergarment").disabled = "";
     }  
     else if (document.getElementById("suit_type").value == "Wet")
     {
-        document.getElementById("ds_undergarment").disabled = "true";
+        document.getElementById("drysuit_text").hidden = "true";
+        document.getElementById("ds_undergarment").hidden = "true";
+        document.getElementById("wetsuit_text").hidden = "";
+        document.getElementById("wetsuit_thickness").hidden = ""; 
         document.getElementById("ds_undergarment").value = "";
         document.getElementById("wetsuit_thickness").disabled = "";
     }
-    }   
+    } 
+
     function start() {
         disableTextBox();
     }
@@ -34,37 +41,81 @@
 <p></p>
     <form action="/new" method="post">
         <h4>Current number of log entries: {{dive_count}}</h4>
-        <h4>Next dive name/log number: </h4><input class="form-control mx-auto w-auto" id="dive_number" name="dive_number" value="{{next_dive}}" type="text">
-        <input class="form-control mx-auto w-auto"type="date" id="date" name="date">
-        <input class="form-control mx-auto w-auto" id="location" name="location" placeholder="Dive Location" type="text">
-        <h4>Time in: (24h and 12h both work)</h4> <input class="form-control mx-auto w-auto"id="time_in" name="time_in" type="time">
-        <input autocomplete="off" class="form-control mx-auto smallText" id="dive_time" name="dive_time" placeholder="Dive Time (minutes)" type="number" min="0">
-        <input autocomplete="off" class="form-control mx-auto smallText" id="max_depth" name="max_depth" placeholder="Max Depth" type="number" min="0">
-        <input autocomplete="off" class="form-control mx-auto smallText" id="avg_depth" name="avg_depth" placeholder="Avg Depth" type="number" min="0">
-        <input autocomplete="off" class="form-control mx-auto smallText" id="visibility" name="visibility" placeholder="Visibility (m)" type="number" min="0">
-        <select name="tank_type" id="tank_type" class="form-control mx-auto w-auto">
-            <option value="" selected>Pick a tank type</option>
-            <option value="ali80">Aluminium 80 (11.1L)</option>
-            <option value="steel12">Steel 12L</option>
-            <option value="steel15">Steel 15L</option>
-            <option value="dbl12">Double 12</option>
-            <option value="dbl_al80">Double Ali 80</option>
-        </select>
-        <h4>Tank pressures:</h4>
-        <input autocomplete="off" class="form-control mx-auto smallText" id="in_pressure" name="in_pressure" placeholder="In" type="number" min="0">
-        <input autocomplete="off" class="form-control mx-auto smallText" id="out_ressure" name="out_pressure" placeholder="Out" type="number" min="0">
-        <input autocomplete="off" class="form-control mx-auto smallText" id="water_temp" name="water_temp" placeholder="Water Temp (C)" type="number" min="0">
-        <input autocomplete="off" class="form-control mx-auto smallText" id="lead_weight" name="lead_weight" placeholder="Lead in kg" type="number" min="0" step="0.5">
-        <select name="suit_type" id="suit_type" class="form-control mx-auto w-auto" onChange="disableTextBox();">
-            <option value="none" selected hidden disabled>Wet or Dry Suit?</option>
-            <option value="Dry">Dry</option>
-            <option value="Wet">Wet</option>
-        </select>
-        <input autocomplete="off" class="form-control mx-auto smallText" id="wetsuit_thickness" name="wetsuit_thickness" placeholder="Wetsuit Thickness" type="number" min="0">
-        <input autocomplete="off" class="form-control mx-auto smallText" id="hood" name="hood" placeholder="Hood Thickness" type="number" min="0">
-        <input class="form-control mx-auto w-auto" id="ds_undergarment" name="ds_undergarment" placeholder="Drysuit undergarment" type="text">
-        <input class="form-control mx-auto w-auto" id="buddy" name="buddy" placeholder="Buddy" type="text">
+        <table>
+            <tr>
+                <td><b>Next dive name/log number: </b></td> 
+                <td><input class="form-control mx-auto w-auto" id="dive_number" name="dive_number" value="{{next_dive}}" type="text"></td>
+                <td><b>Date: </b></td>
+                <td><input class="form-control mx-auto w-auto"type="date" id="date" name="date"></td>
+            </tr>
+            <tr>
+                <td><b>Location: </b></td>
+                <td><input class="form-control mx-auto w-auto" id="location" name="location" placeholder="Dive Location" type="text"></td>
+            </tr>
+            <tr>
+                <td><b>Time in (24h or 12h): </b></td>
+                <td><input class="form-control mx-auto w-auto"id="time_in" name="time_in" type="time"></td>
+                <td><b>Total Dive Time (mins): </b></td>
+                <td><input autocomplete="off" class="form-control mx-auto smallText" id="dive_time" name="dive_time" placeholder="Time" type="number" min="0" step="0.1"></td>
+            </tr>
+            <tr>
+                <td><b>Max depth (m): </b></td>
+                <td><input autocomplete="off" class="form-control mx-auto smallText" id="max_depth" name="max_depth" placeholder="Max" type="number" min="0" step="0.1"></td>
+                <td><b>Average depth (m): </b></td>
+                <td><input autocomplete="off" class="form-control mx-auto smallText" id="avg_depth" name="avg_depth" placeholder="Avg" type="number" min="0" step="0.1"></td>
+            </tr>
+            <tr>
+                <td><b>Visibility (m): </b></td>
+                <td><input autocomplete="off" class="form-control mx-auto smallText" id="visibility" name="visibility" placeholder="Vis" type="number" min="0"></td>
+            </tr>
+            <tr>
+                <td><b>Water Temp.: </b></td>
+                <td><input autocomplete="off" class="form-control mx-auto smallText" id="water_temp" name="water_temp" placeholder="Temp" type="number" min="0" step="0.5"></td>
+            </tr>
+            <tr>
+                <td><b>Tank(s): </b></td>
+                <td><select name="tank_type" id="tank_type" class="form-control mx-auto w-auto">
+                    <option value="" disabled selected>Pick a tank type</option>
+                    {% for tank in scuba_tanks %}
+                        <option value="{{tank}}">{{scuba_tanks[tank]}}</option>
+                    {% endfor %}
+                </select></td>
+                <td><b>Hood: </b></td>
+                <td><input autocomplete="off" class="form-control mx-auto smallText" id="hood" name="hood" placeholder="in mm" type="number" min="0"></td>
+            </tr>
+            <tr>
+                <td><b>Tank pressure start (bar): </b></td>
+                <td><input autocomplete="off" class="form-control mx-auto smallText" id="in_pressure" name="in_pressure" placeholder="In" type="number" min="0"></td>
+                <td><b>Suit type: </b></td>
+                <td><select name="suit_type" id="suit_type" class="form-control mx-auto w-auto" onChange="disableTextBox();">
+                    <option value="none" selected hidden disabled>Wet or Dry Suit?</option>
+                    <option value="Dry">Dry</option>
+                    <option value="Wet">Wet</option>
+                </select></td>
+            </tr>
+            <tr>
+                <td><b>Tank pressure end (bars): </b></td>
+                <td><input autocomplete="off" class="form-control mx-auto smallText" id="out_ressure" name="out_pressure" placeholder="Out" type="number" min="0"></td>
+                <td id="wetsuit_text"><b>Wetsuit: </b></td>
+                <td><input class="form-control mx-auto w-auto" id="wetsuit_thickness" name="wetsuit_thickness" placeholder="Wetsuit" type="text"></td>
+            </tr>
+            <tr>
+                <td><b>RMV: </b></td>
+                <td>Enter dive time, avg depth, in/out pressures and tank type to calculate.<br>View Entry in Dive log to see. </td>
+                <td id="drysuit_text"><b>Undergarment: </b></td>
+                <td><input class="form-control mx-auto w-auto" id="ds_undergarment" name="ds_undergarment" placeholder="Drysuit undergarment" type="text"></td>
+            </tr>
+            <tr>
+                <td><b>Lead (kg): </b></td>
+                <td><input autocomplete="off" class="form-control mx-auto smallText" id="lead_weight" name="lead_weight" placeholder="Lead" type="number" min="0" step="0.5"></td>
+            </tr>
+            <tr>
+                <td><b>Buddy: </b></td>
+                <td><input class="form-control mx-auto w-auto" id="buddy" name="buddy" placeholder="Buddy" type="text"></td>
+            </tr>
+        </table>
         <textarea name="notes" autocomplete="off" id="notes" placeholder="General Notes" class="myNotes form-control mx-auto"></textarea>
+        
         <button class="form-control mx-auto w-auto" type="submit">Submit</button>
     </form>
 {% endblock %}

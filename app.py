@@ -26,6 +26,18 @@ app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
+#dictionary for tank types
+scuba_tanks = {"ali80" : "Aluminium 80", 
+               "steel12" : "Steel 12L",
+               "steel15" : "Steel 15L",
+               "dbl12" : "Double 12",
+               "dbl_al80" : "Double Ali 80"}
+
+tank_volumes = {"ali80" : 11.1, 
+               "steel12" : 12.0,
+               "steel15" : 15.0,
+               "dbl12" : 24.0,
+               "dbl_al80" : 22.2}
 
 @app.after_request
 def after_request(response):
@@ -53,7 +65,7 @@ def view():
     dive_log = sql_select("SELECT * FROM entries WHERE log_id = ?", (dive_id,)).fetchone()
     print(dive_log)
 
-    return render_template("entry.html", dive_log = dive_log)
+    return render_template("entry.html", dive_log = dive_log, scuba_tanks=scuba_tanks, tank_volumes=tank_volumes)
 
 
 @app.route("/new", methods=["GET", "POST"])
@@ -68,6 +80,7 @@ def new_entry():
     #Auto-incrementing dive number to 'official' dive number
     next_dive = (next_dive_number(dive_log, idx = -1))
 
+    #TODO: Add dive guide/DM/instructor tab in here, edit, view and database. Also change edit view to be nicer.
     if request.method == "POST":
         dive_number = request.form.get("dive_number")
         date = request.form.get("date")
@@ -108,7 +121,7 @@ def new_entry():
         
         return redirect("/")
         
-    return render_template("new.html", dive_count=dive_count, next_dive=next_dive)
+    return render_template("new.html", dive_count=dive_count, next_dive=next_dive, scuba_tanks=scuba_tanks, tank_volumes=tank_volumes)
 
 
 @app.route("/editButton", methods=["POST"])
@@ -128,7 +141,7 @@ def editBtn():
     #" string literal contains an unescaped line break error" because it's reading newline characters from sql.
     dive_notes = dive_notes.replace("\r\n", "qtab")
 
-    return render_template("/edit.html", entry=entry, dive_notes=dive_notes)
+    return render_template("/edit.html", entry=entry, dive_notes=dive_notes, scuba_tanks=scuba_tanks)
 
 
 @app.route("/edit", methods=["POST"])
@@ -174,6 +187,16 @@ def edit():
                     "suit_type = ?, hood = ?, wetsuit_thickness = ?, ds_undergarment = ?, buddy = ?, dive_notes = ?, diver_id = ?"
                     "WHERE log_id = ?", (dive_entry))
     
+    return redirect("/")
+
+@app.route("/delButton", methods=["POST"])
+@login_required
+def delBtn():
+
+    dive_id = request.form.get("id")
+
+    sql_select("DELETE FROM entries WHERE diver_id = ? AND log_id = ?", (session["user_id"], dive_id)).fetchone()
+
     return redirect("/")
 
 @app.route("/login", methods=["GET", "POST"])

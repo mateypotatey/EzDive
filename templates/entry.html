@@ -26,8 +26,27 @@
             document.getElementById("drysuit_data").hidden = "true";
         }
     }
+    
+    //The following function calculates the Respiratory Minute volume, if all necessary parameters have been entered
+    var calculatedRMV
+    function RespMinuteVol() {
+        bar_in = "{{dive_log['in_pressure']}}"
+        bar_out = "{{dive_log['out_pressure']}}"
+        avg_depth = "{{dive_log['avg_depth']}}"
+        tank_vol = "{{tank_volumes[dive_log['tank_type']]}}"
+        dive_time = "{{dive_log['dive_time']}}"
+        if (bar_in && bar_out && avg_depth && tank_vol && dive_time) {
+            calculatedRMV = (((bar_in - bar_out) * tank_vol) / dive_time ) / ((avg_depth / 10) + 1)   
+            calculatedRMV = calculatedRMV.toFixed(1) + "L / min";
+        } else {
+            calculatedRMV = "Enter all dive parameters to calculate"
+        }
+        document.getElementById("rmv").innerHTML = calculatedRMV;
+    }
+
     function start() {
         WetOrDry();
+        RespMinuteVol();
     }
 window.onload = start;
 </script>
@@ -41,26 +60,16 @@ window.onload = start;
     <tr>
         <td><b>Dive: </b></td>
         <td>{{dive_log["dive_number"]}}</td>
-        <td><b>Tank pressure (start): </b></td>
-        <td>{{dive_log["in_pressure"]}} bar</td>
-    </tr>
-    <tr>
         <td><b>Date: </b></td>
         <td>{{dive_log["dive_date"]}}</td>
-        <td><b>Tank pressure (end): </b></td>
-        <td>{{dive_log["out_pressure"]}} bar</td>
     </tr>
     <tr>
         <td><b>Location: </b></td>
         <td>{{dive_log["dive_location"]}}</td>
-        <td><b>RMV: </b></td>
-        <td>to be calculated</td>
     </tr>
     <tr>
         <td><b>Time in: </b></td>
         <td>{{dive_log["time_in"]}}</td>
-    </tr>
-    <tr>
         <td><b>Total Dive Time: </b></td>
         <td>{{dive_log["dive_time"]}} mins</td>
     </tr>
@@ -80,39 +89,51 @@ window.onload = start;
     </tr>
     <tr>
         <td><b>Tank(s): </b></td>
-        <td>{{dive_log["tank_type"]}}</td>
+        <td>{{scuba_tanks[dive_log["tank_type"]]}}</td>
         <td><b>Hood: </b></td>
         <td>{{dive_log["hood"]}}</td>
     </tr>
     <tr>
-        <td><b>Visibility: </b></td>
-        <td>{{dive_log["visibility"]}}</td>
+        <td><b>Tank pressure (start): </b></td>
+        <td>{{dive_log["in_pressure"]}} bar</td>
         <td><b>Suit type: </b></td>
         <td>{{dive_log["suit_type"]}}</td>
     </tr>
     <tr>
-        <td><b>Visibility: </b></td>
-        <td>{{dive_log["visibility"]}}</td>
+        <td><b>Tank pressure (end): </b></td>
+        <td>{{dive_log["out_pressure"]}} bar</td>
         <td id="wetsuit_text"><b>Wetsuit Thickness: </b></td>
         <td id="wetsuit_data">{{dive_log["wetsuit_thickness"]}}</td>
         <td id="drysuit_text"><b>Undergarment: </b></td>
         <td id="drysuit_data">{{dive_log["ds_undergarment"]}}</td>
     </tr>
     <tr>
-        <td><b>Buddy: </b></td>
-        <td>{{dive_log["buddy"]}}</td>
+        <td><b>RMV: </b></td>
+        <td id="rmv"></td>
         <td><b>Lead: </b></td>
         <td>{{dive_log["lead_weight"]}}</td>
     </tr>
     <tr>
-        <td><b>Notes: </b></td>
-        <td>{{dive_log['dive_notes']}}</td>
+        <td><b>Buddy: </b></td>
+        <td>{{dive_log["buddy"]}}</td>
     </tr>
 </table>
-
-<form action="/editButton" method="post">
-    <input name="id" type="hidden" value="{{ dive_log.log_id }}">
-    <input type="submit" value="Edit Entry">
-</form>
+<b>Notes: </b>
+<div class="viewNotes">{{dive_log['dive_notes']}}</div>
+<br>
+<table>
+    <tr>
+        <form action="/editButton" method="post">
+        <input name="id" type="hidden" value="{{ dive_log.log_id }}">
+        <input type="submit" value="Edit Entry">
+        </form>
+    </tr>
+    <tr>
+        <form onsubmit="return confirm('Do you really want to delete this entry?');" action="/delButton" method="post">
+        <input name="id" type="hidden" value="{{ dive_log.log_id }}">
+        <input type="submit" value="Delete Entry">
+        </form>
+    </tr>
+</table>
 {% endblock %}
 
