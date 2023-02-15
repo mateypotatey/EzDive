@@ -16,10 +16,21 @@
     </head>
     <!--onload="start()" calls a function that's present in different pages to load all the scripts in that page on pageload-->
     <body onload="start()">
-        <a href="/">Home/Logbook</a>
-        <a href="/new">New Entry</a>
-        <a href="/summary">Summary Stats</a>
-        <a href="/logout">Logout</a>
+        <div class="navbar">
+            <div class="row child fit">
+                <div class="col-sm-3 child">
+                    <a href="/">Home/Logbook</a>
+                </div>
+                <div class="col-sm-3 child">
+                    <a href="/new">New Entry</a>
+                </div>
+                <div class="col-sm-3 child">
+                    <a href="/logout">Logout</a>
+                </div>
+                </div>
+            </div>
+        </div>
+        <br>
         {% block body %} {% endblock %}
     </body>
 
