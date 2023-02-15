@@ -55,85 +55,93 @@ window.onload = start;
 
 {% block body %}
 
-<h4>View Entry</h4>
-<table>
-    <tr>
-        <td><b>Dive: </b></td>
-        <td>{{dive_log["dive_number"]}}</td>
-        <td><b>Date: </b></td>
-        <td>{{dive_log["dive_date"]}}</td>
-    </tr>
-    <tr>
-        <td><b>Location: </b></td>
-        <td>{{dive_log["dive_location"]}}</td>
-    </tr>
-    <tr>
-        <td><b>Time in: </b></td>
-        <td>{{dive_log["time_in"]}}</td>
-        <td><b>Total Dive Time: </b></td>
-        <td>{{dive_log["dive_time"]}} mins</td>
-    </tr>
-    <tr>
-        <td><b>Max depth: </b></td>
-        <td>{{dive_log["max_depth"]}} metres</td>
-        <td><b>Average depth: </b></td>
-        <td>{{dive_log["avg_depth"]}} metres</td>
-    </tr>
-    <tr>
-        <td><b>Visibility: </b></td>
-        <td>{{dive_log["visibility"]}} metres</td>
-    </tr>
-    <tr>
-        <td><b>Water Temp.: </b></td>
-        <td>{{dive_log["water_temp"]}}</td>
-    </tr>
-    <tr>
-        <td><b>Tank(s): </b></td>
-        <td>{{scuba_tanks[dive_log["tank_type"]]}}</td>
-        <td><b>Hood: </b></td>
-        <td>{{dive_log["hood"]}}</td>
-    </tr>
-    <tr>
-        <td><b>Tank pressure (start): </b></td>
-        <td>{{dive_log["in_pressure"]}} bar</td>
-        <td><b>Suit type: </b></td>
-        <td>{{dive_log["suit_type"]}}</td>
-    </tr>
-    <tr>
-        <td><b>Tank pressure (end): </b></td>
-        <td>{{dive_log["out_pressure"]}} bar</td>
-        <td id="wetsuit_text"><b>Wetsuit Thickness: </b></td>
-        <td id="wetsuit_data">{{dive_log["wetsuit_thickness"]}}</td>
-        <td id="drysuit_text"><b>Undergarment: </b></td>
-        <td id="drysuit_data">{{dive_log["ds_undergarment"]}}</td>
-    </tr>
-    <tr>
-        <td><b>RMV: </b></td>
-        <td id="rmv"></td>
-        <td><b>Lead: </b></td>
-        <td>{{dive_log["lead_weight"]}}</td>
-    </tr>
-    <tr>
-        <td><b>Buddy: </b></td>
-        <td>{{dive_log["buddy"]}}</td>
-    </tr>
-</table>
-<b>Notes: </b>
-<div class="viewNotes">{{dive_log['dive_notes']}}</div>
+<h1>View Entry</h1>
 <br>
-<table>
-    <tr>
-        <form action="/editButton" method="post">
-        <input name="id" type="hidden" value="{{ dive_log.log_id }}">
-        <input type="submit" value="Edit Entry">
-        </form>
-    </tr>
-    <tr>
-        <form onsubmit="return confirm('Do you really want to delete this entry?');" action="/delButton" method="post">
-        <input name="id" type="hidden" value="{{ dive_log.log_id }}">
-        <input type="submit" value="Delete Entry">
-        </form>
-    </tr>
-</table>
+<div class="containerSmall">
+    <table class="center">
+        <tr>
+            <td><b>Dive: </b></td>
+            <td>{{dive_log["dive_number"]}}</td>
+            <td><b>Date: </b></td>
+            <td>{{dive_log["dive_date"]}}</td>
+        </tr>
+        <tr>
+            <td><b>Location: </b></td>
+            <td>{{dive_log["dive_location"]}}</td>
+        </tr>
+        <tr>
+            <td><b>Time in: </b></td>
+            <td>{{dive_log["time_in"]}}</td>
+            <td><b>Total Dive Time: </b></td>
+            <td>{{dive_log["dive_time"]}} mins</td>
+        </tr>
+        <tr>
+            <td><b>Max depth: </b></td>
+            <td>{{dive_log["max_depth"]}} metres</td>
+            <td><b>Average depth: </b></td>
+            <td>{{dive_log["avg_depth"]}} metres</td>
+        </tr>
+        <tr>
+            <td><b>Visibility: </b></td>
+            <td>{{dive_log["visibility"]}} metres</td>
+        </tr>
+        <tr>
+            <td><b>Water Temp.: </b></td>
+            <td>{{dive_log["water_temp"]}}</td>
+        </tr>
+        <tr>
+            <td><b>Tank(s): </b></td>
+            <td>{{scuba_tanks[dive_log["tank_type"]]}}</td>
+            <td><b>Hood: </b></td>
+            <td>{{dive_log["hood"]}}</td>
+        </tr>
+        <tr>
+            <td><b>Tank pressure (start): </b></td>
+            <td>{{dive_log["in_pressure"]}} bar</td>
+            <td><b>Suit type: </b></td>
+            <td>{{dive_log["suit_type"]}}</td>
+        </tr>
+        <tr>
+            <td><b>Tank pressure (end): </b></td>
+            <td>{{dive_log["out_pressure"]}} bar</td>
+            <td id="wetsuit_text"><b>Wetsuit Thickness: </b></td>
+            <td id="wetsuit_data">{{dive_log["wetsuit_thickness"]}}</td>
+            <td id="drysuit_text"><b>Undergarment: </b></td>
+            <td id="drysuit_data">{{dive_log["ds_undergarment"]}}</td>
+        </tr>
+        <tr>
+            <td><b>RMV: </b></td>
+            <td id="rmv"></td>
+            <td><b>Lead: </b></td>
+            <td>{{dive_log["lead_weight"]}}</td>
+        </tr>
+        <tr>
+            <td><b>Buddy: </b></td>
+            <td>{{dive_log["buddy"]}}</td>
+        </tr>
+    </table>
+    <br>
+    <div class="container viewNotes">
+        <div class="labels">Notes:</div>
+        {{dive_log['dive_notes']}}
+    </div>
+    <br>
+    <div class="container-fluid">
+        <div class="row navbar">
+        <div class="col-sm-2">
+            <form action="/editButton" method="post">
+            <input name="id" type="hidden" value="{{ dive_log.log_id }}">
+            <input type="submit" value="Edit Entry">
+            </form>
+        </div>
+        <div class="col-sm-2">
+            <form onsubmit="return confirm('Do you really want to delete this entry?');" action="/delButton" method="post">
+            <input name="id" type="hidden" value="{{ dive_log.log_id }}">
+            <input type="submit" value="Delete Entry">
+            </form>
+        </div>
+    </div>
+    </div>
+</div>
 {% endblock %}
 
