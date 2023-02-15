@@ -14,8 +14,36 @@
             htmlStr = htmlStr.replaceAll("qtab", "\n")
             return htmlStr;
         }
+
+        function disableTextBox() {  
+            if (document.getElementById("suit_type").value == "none")  
+            
+            {      
+            document.getElementById("wetsuit_thickness").disabled = "true";
+            document.getElementById("ds_undergarment").disabled = "true"; 
+            } 
+            else if (document.getElementById("suit_type").value == "Dry")
+            {  
+                document.getElementById("wetsuit_thickness").hidden = "true"; 
+                document.getElementById("wetsuit_text").hidden = "true";
+                document.getElementById("drysuit_text").hidden = "";
+                document.getElementById("ds_undergarment").hidden = "";
+                document.getElementById("wetsuit_thickness").value = "";
+                document.getElementById("ds_undergarment").disabled = "";
+            }  
+            else if (document.getElementById("suit_type").value == "Wet")
+            {
+                document.getElementById("drysuit_text").hidden = "true";
+                document.getElementById("ds_undergarment").hidden = "true";
+                document.getElementById("wetsuit_text").hidden = "";
+                document.getElementById("wetsuit_thickness").hidden = ""; 
+                document.getElementById("ds_undergarment").value = "";
+                document.getElementById("wetsuit_thickness").disabled = "";
+            }
+        }
         
 function start() {
+    disableTextBox();
     log_notes = unEscape("{{dive_notes}}");
     document.getElementById("notes").value = log_notes
 }
@@ -24,38 +52,160 @@ function start() {
 {% block body %}
 
 <h1>Edit Entry</h1>
-<p></p>
-    <form action="/edit" method="post">
-        <h4>Dive number: {{entry.dive_number}}</h4>
-        <input class="form-control mx-auto w-auto" id="dive_number" name="dive_number" value="{{entry.dive_number}}" type="text">
-        <input class="form-control mx-auto w-auto"type="date" id="date" name="date" value="{{entry.dive_date}}">
-        <input class="form-control mx-auto w-auto" id="location" name="location" value="{{entry.dive_location}}" type="text">
-        <h4>Time in: (24h and 12h both work)</h4> <input class="form-control mx-auto w-auto"id="time_in" name="time_in" type="time" value="{{entry.time_in}}">
-        <input autocomplete="off" class="form-control mx-auto smallText" id="dive_time" name="dive_time" value="{{entry.dive_time}}" type="number" min="0">
-        <input autocomplete="off" class="form-control mx-auto smallText" id="max_depth" name="max_depth" value="{{entry.max_depth}}" type="number" min="0">
-        <input autocomplete="off" class="form-control mx-auto smallText" id="avg_depth" name="avg_depth" value="{{entry.avg_depth}}" type="number" min="0">
-        <input autocomplete="off" class="form-control mx-auto smallText" id="visibility" name="visibility" value="{{entry.visibility}}" type="number" min="0">
-        <select name="tank_type" id="tank_type" class="form-control mx-auto w-auto">
-            <option value="{{entry.tank_type}}" selected>{{scuba_tanks[entry.tank_type]}}</option>
-            {% for tank in scuba_tanks %}
-                <option value="{{tank}}">{{scuba_tanks[tank]}}</option>
-            {% endfor %}
-        </select>
-        <h4>Tank pressures:</h4>
-        <input autocomplete="off" class="form-control mx-auto smallText" id="in_pressure" name="in_pressure" value="{{entry.in_pressure}}" type="number" min="0">
-        <input autocomplete="off" class="form-control mx-auto smallText" id="out_pressure" name="out_pressure" value="{{entry.out_pressure}}" type="number" min="0">
-        <input autocomplete="off" class="form-control mx-auto smallText" id="water_temp" name="water_temp" value="{{entry.water_temp}}" type="number" min="0">
-        <input autocomplete="off" class="form-control mx-auto smallText" id="lead_weight" name="lead_weight" value="{{entry.lead_weight}}" type="number" min="0" step="0.5">
-        <select name="suit_type" id="suit_type" class="form-control mx-auto w-auto">
-            <option value="{{entry.suit_type}}" selected>{{entry.suit_type}}</option>
-            <option value="Dry">Dry</option>
-            <option value="Wet">Wet</option>
-        </select>
-        <input autocomplete="off" class="form-control mx-auto smallText" id="wetsuit_thickness" name="wetsuit_thickness" value="{{entry.wetsuit_thickness}}" type="number" min="0">
-        <input autocomplete="off" class="form-control mx-auto smallText" id="hood" name="hood" value="{{entry.hood}}" type="number" min="0">
-        <input class="form-control mx-auto w-auto" id="ds_undergarment" name="ds_undergarment" value="{{entry.ds_undergarment}}" type="text">
-        <input class="form-control mx-auto w-auto" id="buddy" name="buddy" value="{{entry.buddy}}" type="text">
-        <textarea name="notes" autocomplete="off" id="notes" class="myNotes form-control mx-auto"></textarea>
-        <button class="form-control mx-auto w-auto" type="submit">Submit</button>
-    </form>
+<br>
+<h4>Dive Entry/Number: {{entry.dive_number}}</h4>
+<br>
+<form action="/edit" method="post">
+<div class="container labels">
+    <div class="row">
+        <div class="col-sm-3 child">
+            <div class="mb-3">
+                <label for="dive_number" class="form-label">Next dive number/name:</label>
+                <input class="form-control" id="dive_number" name="dive_number" value="{{entry.dive_number}}" type="text">
+            </div>
+        </div>
+        <div class="col-sm-3 child">
+            <div class="mb-3">
+                <label for="date" class="form-label">Date: </label>
+                <input class="form-control"type="date" id="date" name="date" value="{{entry.dive_date}}">
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-3 child">
+            <div class="mb-3">
+                <label for="location" class="form-label">Location: </label>
+                <input class="form-control" id="location" name="location" placeholder="Dive Location" type="text" value="{{entry.dive_location}}">
+            </div>
+        </div>
+        <div class="col-sm-3 child">
+            <div class="mb-3">
+                <label for="buddy" class="form-label">Buddy: </label>
+                <input class="form-control" id="buddy" name="buddy" placeholder="Buddy" type="text" value="{{entry.buddy}}">
+            </div>
+        </div>
+    </div>
+    <br>
+    <br>
+    <div class="row">
+        <div class="col-sm-3 child">
+            <div class="mb-3">
+                <label for="time_in" class="form-label">Time in (24h or 12h): </label>
+                <input class="form-control" id="time_in" name="time_in" type="time" value="{{entry.time_in}}">
+            </div>
+        </div>
+        <div class="col-sm-3 child">
+            <div class="mb-3">
+                <label for="dive_time" class="form-label">Total Dive Time (mins): </label>
+                <input autocomplete="off" class="form-control" id="dive_time" name="dive_time" value="{{entry.dive_time}}" type="number" min="0" step="0.1">
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-3 child">
+            <div class="mb-3 text-max_depth">
+                <label for="exampleFormControlInput1" class="form-label">Max depth (m): </label>
+                <input autocomplete="off" class="form-control" id="max_depth" name="max_depth" value="{{entry.max_depth}}" type="number" min="0" step="0.1">
+            </div>
+        </div>
+        <div class="col-sm-3 child">
+            <div class="mb-3">
+                <label for="avg_depth" class="form-label">Average depth (m): </label>
+                <input autocomplete="off" class="form-control" id="avg_depth" name="avg_depth" value="{{entry.avg_depth}}" type="number" min="0" step="0.1">
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-3 child">
+            <div class="mb-3">
+                <label for="visibility" class="form-label">Visibility (m): </label>
+                <input autocomplete="off" class="form-control" id="visibility" name="visibility" value="{{entry.visibility}}" type="number" min="0">
+            </div>
+        </div>
+        <div class="col-sm-3 child">
+            <div class="mb-3">
+                <label for="water_temp" class="form-label">Water temp: </label>
+                <input autocomplete="off" class="form-control" id="water_temp" name="water_temp" value="{{entry.water_temp}}" type="number" min="0" step="0.1">
+            </div>
+        </div>
+    </div>
+    <div class="row child fit">
+        <div class="col-sm-4 child">
+            <div class="mb-3">
+                <label for="tank_type" class="form-label">Tank(s): </label>
+                <select name="tank_type" id="tank_type" class="form-select">
+                    <option value="{{entry.tank_type}}" selected>{{scuba_tanks[entry.tank_type]}}</option>
+                    {% for tank in scuba_tanks %}
+                        <option value="{{tank}}">{{scuba_tanks[tank]}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <div class="col-sm-2 child">
+            <div class="mb-0">
+                <label for="in_pressure" class="form-label">Pressure in: </label>
+                <input autocomplete="off" class="form-control" id="in_pressure" name="in_pressure" value="{{entry.in_pressure}}" type="number" min="0">
+            </div>
+        </div>
+        <div class="col-sm-2 child">
+            <div class="mb-3">
+                <label for="out_pressure" class="form-label">Pressure out: </label>
+                <input autocomplete="off" class="form-control" id="out_pressure" name="out_pressure" value="{{entry.out_pressure}}" type="number" min="0">
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-9 child">
+            <label class="form-label mx-auto w-auto">RMV:</label>
+            <label class="form-label mx-auto w-auto text"> Enter dive time, avg depth, in/out pressures and tank type to calculate. View Entry in Dive log to see. </label>
+        </div>
+    </div>
+    <br>
+    <div class="row child fit">
+        <div class="col-sm-2 child">
+            <div class="mb-3">
+                <label for="suit_type" class="form-label">Suit type: </label>
+                <select name="suit_type" id="suit_type" class="form-select" onChange="disableTextBox();">
+                    <option value="{{entry.suit_type}}" selected>{{entry.suit_type}}</option>
+                    <option value="Dry">Dry</option>
+                    <option value="Wet">Wet</option>
+                </select>
+            </div>
+        </div>
+        <div class="col-sm-3 child">
+            <div class="mb-3">
+                <label for="wetsuit_thickness" id="wetsuit_text" class="form-label">Wetsuit: </label>
+                <input class="form-control" id="wetsuit_thickness" name="wetsuit_thickness" value="{{entry.wetsuit_thickness}}" type="text">
+            </div>
+        </div>
+        <div class="col-sm-3 child">
+            <div class="mb-3">
+                <label for="ds_undergarment" id="drysuit_text" class="form-label">Undergarment: </label>
+                <input class="form-control" id="ds_undergarment" name="ds_undergarment" placeholder="Drysuit undergarment" value="{{entry.ds_undergarment}}" type="text">
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-3 child">
+            <div class="mb-3">
+                <label for="hood" class="form-label">Hood: </label>
+                <input autocomplete="off" class="form-control" id="hood" name="hood" value="{entry.hood}" type="number" min="0">
+            </div>
+        </div>
+        <div class="col-sm-3 child">
+            <div class="mb-3">
+                <label for="lead_weight" class="form-label">Lead (kg): </label>
+                <input autocomplete="off" class="form-control" id="lead_weight" name="lead_weight" value="{{entry.lead_weight}}" type="number" min="0" step="0.5">
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-9 child">
+            <textarea name="notes" autocomplete="off" id="notes" class="myNotes form-control"></textarea>
+        </div>
+    </div>
+    <br>
+</div>  
+<button class="form-control mx-auto w-auto" type="submit">Submit</button>
+</form>
 {% endblock %}
