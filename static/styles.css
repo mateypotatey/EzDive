@@ -3,8 +3,7 @@ h1 {
 }
 
 .myNotes {
-    height:300px;
-    width:420px;
+    height:200px;
 }
 
 .viewNotes {
@@ -19,3 +18,43 @@ h4 {
     text-align: center;
     font-size: 18px;
 }
+
+.container {
+    background-color: #ffffff;  
+    margin:auto;
+    width:80%;
+ }
+
+ .navbar {
+    margin:auto;
+    width:52%;
+    text-align: center;
+ }
+
+ .fit {
+    width:87%;
+ }
+
+ .child {
+    margin: 0 auto;
+ }
+ 
+ .content {
+    text-align: center; 
+    background-color: #cdcdcd;
+    width: auto;
+ }
+ 
+ .labels {
+    text-align: left;
+    font-weight: bold;
+ }
+
+ .text {
+    text-align: left;
+    font-weight: normal;
+ }
+
+ .col-center{
+    margin:0 auto;
+  }
