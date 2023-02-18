@@ -50,7 +50,7 @@ def check_entry_validity(dive_entry):
 #Check dive number
 """This function checks if the last dive log entry was a number or text (like 'Training dive'). 
 If the last log entry was a number, it just auto-increments to the next number. If it was text, 
-it recurses back to check the last time the log entry was a number and auto-increments."""
+it recurses back to check the last time the log entry was a number and adds +1"""
 def next_dive_number(dive_log_entry, idx):
     try:
         last_dive = dive_log_entry[idx]["dive_number"]
