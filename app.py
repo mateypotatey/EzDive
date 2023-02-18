@@ -1,22 +1,10 @@
 from flask import Flask, redirect, render_template, request, session
 from flask_session import Session
 from werkzeug.security import check_password_hash, generate_password_hash
-import sqlite3
-from sqlite3 import Error
-from helpers import check_entry_validity, login_required, apology, sql_select, sql_insert, sql_update, next_dive_number
+from helpers import check_entry_validity, login_required, apology, sql_select, sql_insert, sql_init, next_dive_number
+from datetime import datetime
 
 app = Flask(__name__)
-
-#The below line will enable debug mode which means the flask app will restart upon any code changes, so don't need to restart the flask run.
-#type export FLASK_DEBUG=1 in terminal before typing flask run to enable debugger
-
-#more complicated sqlite connection protocol.
-"""
-Using isolation_level = None so queries are sent without having to commit. Not a problem for single users but may need to be changed to connectio.commit() for multi user.
-Check_same_thread=False because I'm establishing a connection at the start. Ideally you'd combine the connection and query in one function to follow the motto "late to open, 
-early to close: https://stackoverflow.com/questions/48218065/objects-created-in-a-thread-can-only-be-used-in-that-same-thread?rq=1      
-        
-connection = sqlite3.connect(path, isolation_level = None, check_same_thread = False)"""
 
 # Ensure templates are auto-reloaded
 app.config["TEMPLATES_AUTO_RELOAD"] = True
@@ -26,7 +14,10 @@ app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
-#dictionary for tank types
+#Creates database and tables
+sql_init()
+
+#dictionary for hard coded tank types
 scuba_tanks = {"ali80" : "Aluminium 80", 
                "steel12" : "Steel 12L",
                "steel15" : "Steel 15L",
@@ -54,6 +45,14 @@ def index():
     current_user = sql_select("SELECT * FROM users WHERE user_id = ?", (session["user_id"],)).fetchone()
     dive_log = sql_select("SELECT * FROM entries WHERE diver_id = ?", (session["user_id"],)).fetchall()
     
+    #Loop to change the date stored as YYYY-MM-DD to DD-MM-YYYY
+    for dive in dive_log:
+        try:
+            dive_date = datetime.strptime(dive["dive_date"], "%Y-%m-%d")
+            dive["dive_date"] = dive_date.strftime("%d-%m-%Y")
+        except ValueError:
+            continue
+
     dive_count = len(dive_log)
         
     return render_template("index.html", user=current_user["username"], dive_log=dive_log, dive_count=dive_count)
@@ -63,7 +62,13 @@ def index():
 def view():
     dive_id = request.form.get("id")
     dive_log = sql_select("SELECT * FROM entries WHERE log_id = ?", (dive_id,)).fetchone()
-    print(dive_log)
+
+    #Loop to change the date stored as YYYY-MM-DD to DD-MM-YYYY
+    try:
+        dive_date = datetime.strptime(dive_log["dive_date"], "%Y-%m-%d")
+        dive_log["dive_date"] = dive_date.strftime("%d-%m-%Y")
+    except ValueError:
+        print("")
 
     return render_template("entry.html", dive_log = dive_log, scuba_tanks=scuba_tanks, tank_volumes=tank_volumes)
 
@@ -72,7 +77,6 @@ def view():
 @login_required
 def new_entry():
 
-    current_user = sql_select("SELECT * FROM users WHERE user_id = ?", (session["user_id"],)).fetchone()
     dive_log = sql_select("SELECT * FROM entries WHERE diver_id = ?", (session["user_id"],)).fetchall()
   
     dive_count = len(dive_log)
@@ -80,7 +84,6 @@ def new_entry():
     #Auto-incrementing dive number to 'official' dive number
     next_dive = (next_dive_number(dive_log, idx = -1))
 
-    #TODO: Add dive guide/DM/instructor tab in here, edit, view and database. Also change edit view to be nicer.
     if request.method == "POST":
         dive_number = request.form.get("dive_number")
         date = request.form.get("date")
@@ -101,7 +104,6 @@ def new_entry():
         ds_undergarment = request.form.get("ds_undergarment")
         buddy = request.form.get("buddy")
         dive_notes = request.form.get("notes")
-        print(lead_weight,wetsuit_thickness,ds_undergarment, hood)
 
         dive_entry = [dive_number, date, location, time_in, dive_time, max_depth, avg_depth, visibility, tank_type, in_pressure, out_pressure, water_temp, 
             lead_weight, suit_type, hood, wetsuit_thickness, ds_undergarment, buddy, dive_notes, session["user_id"]]
@@ -168,10 +170,6 @@ def edit():
     ds_undergarment = request.form.get("ds_undergarment")
     buddy = request.form.get("buddy")
     dive_notes = request.form.get("notes")
-
-    #TODO: Changing the undergarment shows up as none, even when something is entered. Does it have to do with None value in SQL?
-    #Looks like even adding a new entry and adding values to drysuit undergarment, lead weight and wetsuit thickness does nothing.
-    print(ds_undergarment)
 
     dive_entry = [dive_number, date, location, time_in, dive_time, max_depth, avg_depth, visibility, tank_type, in_pressure, out_pressure, water_temp, 
         lead_weight, suit_type, hood, wetsuit_thickness, ds_undergarment, buddy, dive_notes, session["user_id"], dive_log]    
@@ -243,7 +241,7 @@ def logout():
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
-    """Register user"""
+    """Register user: This was copied from my CS50 - Finance codespace since it is essentially the same."""
 
     if request.method == "POST":
         """Not saving password variable from form to minimise saving sensitive info into memory"""
