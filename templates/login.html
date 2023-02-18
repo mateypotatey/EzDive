@@ -14,19 +14,31 @@
         <title>EzDive - Login Page</title>
     </head>
     <body>
-        <a href="/">Home/Logbook</a>
-        <a href="/register">Register</a>
-        <a href="/summary">Site Stats</a>
-    </body>
-
-</html>
-        <h1>Login Page</h1>
+        <div class="navbar">
+            <div class="row child fit">
+                <div class="col-sm-3 child">
+                    <a href="/">Home/Logbook</a>
+                </div>
+                <div class="col-sm-3 child">
+                    <a href="/register">Register</a>
+                </div>
+            </div>
+        </div>
+<br>
+        <h1>Welcome to EzDive, a simple dive-log app</h1>
+        <br>
+        <h4>Please login or register a new account</h2>
         <p></p>
             <form action="/login" method="post">
                 <input autocomplete="off" autofocus class="form-control mx-auto w-auto" id="username" name="username" placeholder="Username" type="text">
                 <input autocomplete="off" class="form-control mx-auto w-auto" id="password" name="password" placeholder="Password" type="password">
+                <br>
                 <button class="form-control mx-auto w-auto" type="submit">Login</button>
             </form>
+            <br>
             <h4>Don't have an account? Click <a href="/register">here</a> to register.</h4>
             <p></p>
             <h4>There are currently {{ total_users }} registered users with a total number of {{ logged_dives }} logged dives.</h4>
+        </body>
+
+</html>

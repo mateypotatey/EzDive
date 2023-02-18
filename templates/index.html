@@ -5,18 +5,20 @@
 <div>
     <h1>Welcome back, {{ user }}</h1>
 </div>
-<div>You have logged {{dive_count}} dives.</div>
-<div>
-    <table>
+<div class="content">You have logged {{dive_count}} dives.</div>
+<div class="containerTable">
+    <table class="table table-sm">
+      <thead>
         <tr>
-          <th>Dive Number</th>
-          <th>Date</th>
-          <th>Location</th>
-          <th>Max Depth</th>
-          <th>Dive Time</th>
-          <th>Buddy</th>
+          <th scope="col">Dive ID</th>
+          <th scope="col">Date</th>
+          <th scope="col">Location</th>
+          <th scope="col">Max Depth</th>
+          <th scope="col">Dive Time</th>
+          <th scope="col">Buddy</th>
           <th></th>
         </tr>
+      </thead>
         {% for dive in dive_log %}
         <tr>
           <td>{{dive.dive_number}}</td>
