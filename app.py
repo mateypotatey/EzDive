@@ -1,93 +1,10 @@
 from flask import Flask, redirect, render_template, request, session
 from flask_session import Session
 from werkzeug.security import check_password_hash, generate_password_hash
-from functools import wraps
-import sqlite3
-from sqlite3 import Error
+from helpers import check_entry_validity, login_required, apology, sql_select, sql_insert, sql_init, next_dive_number
+from datetime import datetime
 
 app = Flask(__name__)
-
-#The below line will enable debug mode which means the flask app will restart upon any code changes, so don't need to restart the flask run.
-#type export FLASK_DEBUG=1 in terminal before typing flask run to enable debugger
-
-#more complicated sqlite connection protocol.
-"""
-def create_connection(path):
-    connection = None
-    try:
-        Using isolation_level = None so queries are sent without having to commit. Not a problem for single users but may need to be changed to connectio.commit() for multi user.
-        Check_same_thread=False because I'm establishing a connection at the start. Ideally you'd combine the connection and query in one function to follow the motto "late to open, 
-        early to close: https://stackoverflow.com/questions/48218065/objects-created-in-a-thread-can-only-be-used-in-that-same-thread?rq=1      
-        
-        connection = sqlite3.connect(path, isolation_level = None, check_same_thread = False)
-        print("Connection to SQLITE DB successful")
-    except Error as e:
-        print(f"The error '{e}' occured")
-    
-    return connection"""
-
-#The below is a template to use for late open early close philosophy for database
-"""def sql_query(query):
-    try:
-        with sqlite3.connect("ezdive.db") as connection:
-            cursor = connection.cursor()
-            cursor.execute(query)
-            connection.commit()
-            print("Query executed successfully")
-    except Error as e:
-        print(f"Query was unsuccessfull: {e}")"""
-
-"""def sql_entry(query):
-    try:
-        cursor.execute(query)
-        print("query executed")
-    except Error as e:
-        print(f"Error encountered: {e}")"""
-
-
-def apology(message, code = 400):
-    """Render message as an apology to user."""
-    def escape(s):
-        """
-        Escape special characters.
-
-        https://github.com/jacebrowning/memegen#special-characters
-        """
-        for old, new in [("-", "--"), (" ", "-"), ("_", "__"), ("?", "~q"),
-                         ("%", "~p"), ("#", "~h"), ("/", "~s"), ("\"", "''")]:
-            s = s.replace(old, new)
-        return s
-    return render_template("apology.html", top=code, bottom=escape(message)), code
-
-def login_required(f):
-    """
-    Decorate routes to require login.
-
-    https://flask.palletsprojects.com/en/1.1.x/patterns/viewdecorators/
-    """
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if session.get("user_id") is None:
-            return redirect("/login")
-        return f(*args, **kwargs)
-    return decorated_function
-
-#Function to check if all fields are empty. If they are, print error message.
-def check_entry_validity(dive_entry):
-    empty_counter = 0
-    for entry in dive_entry:
-        if entry == "":
-            print("entry is empty")
-            empty_counter += 1
-        else:
-            print("go on")
-            continue
-    
-    if len(dive_entry) == empty_counter:
-        print("Why did you even make this entry?")
-        return False
-    else:
-        return True
 
 # Ensure templates are auto-reloaded
 app.config["TEMPLATES_AUTO_RELOAD"] = True
@@ -97,20 +14,21 @@ app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
-#add a global username variable to call on the page
-username = None
+#Creates database and tables
+sql_init()
 
-#Change sqlite query result tuple to dict
-def dict_factory(cursor, row):
-    fields = [column[0] for column in cursor.description]
-    return {key: value for key, value in zip(fields, row)}
+#dictionary for hard coded tank types
+scuba_tanks = {"ali80" : "Aluminium 80", 
+               "steel12" : "Steel 12L",
+               "steel15" : "Steel 15L",
+               "dbl12" : "Double 12",
+               "dbl_al80" : "Double Ali 80"}
 
-#connect to server
-connection = sqlite3.connect("ezdive.db", isolation_level=None, check_same_thread=False)
-
-#https://docs.python.org/3/library/sqlite3.html#sqlite3-howto-row-factory the below code will turn tuple sql query result into dictionary
-connection.row_factory = dict_factory
-cursor = connection.cursor()
+tank_volumes = {"ali80" : 11.1, 
+               "steel12" : 12.0,
+               "steel15" : 15.0,
+               "dbl12" : 24.0,
+               "dbl_al80" : 22.2}
 
 @app.after_request
 def after_request(response):
@@ -123,39 +41,51 @@ def after_request(response):
 @app.route("/")
 @login_required
 def index():
-    #the below function opens a connection only to execute the statement.
-    """def sql_entry(query, user):
-        try:
-            with sqlite3.connect("ezdive.db") as connection:
-                connection.row_factory = dict_factory
-                cursor = connection.cursor()
-                person = cursor.execute(query, user)
-                connection.commit()
-                print("Query executed successfully")
-                return person
-        except Error as e:
-            print(f"Error encountered: {e}")
-        print()"""
-
-    current_user = cursor.execute("SELECT * FROM users WHERE user_id = ?", (session["user_id"],)).fetchone()
-    dive_log = cursor.execute("SELECT * FROM entries WHERE diver_id = ?", (session["user_id"],)).fetchall()
-    print(current_user)
-    print(dive_log)
+     
+    current_user = sql_select("SELECT * FROM users WHERE user_id = ?", (session["user_id"],)).fetchone()
+    dive_log = sql_select("SELECT * FROM entries WHERE diver_id = ?", (session["user_id"],)).fetchall()
     
-    #Below code changes 'None' in database to an empty string for better visualisation in HTML
-    for dive_entry in dive_log:
-        for parameter in dive_entry:
-            if dive_entry[parameter] == None:
-                dive_entry[parameter] = "-"
-            else:
-                continue
+    #Loop to change the date stored as YYYY-MM-DD to DD-MM-YYYY
+    for dive in dive_log:
+        try:
+            dive_date = datetime.strptime(dive["dive_date"], "%Y-%m-%d")
+            dive["dive_date"] = dive_date.strftime("%d-%m-%Y")
+        except ValueError:
+            continue
 
-    return render_template("index.html", user=current_user["username"], dive_log=dive_log)
+    dive_count = len(dive_log)
+        
+    return render_template("index.html", user=current_user["username"], dive_log=dive_log, dive_count=dive_count)
+
+@app.route("/view", methods=["POST"])
+@login_required
+def view():
+    dive_id = request.form.get("id")
+    dive_log = sql_select("SELECT * FROM entries WHERE log_id = ?", (dive_id,)).fetchone()
+
+    #Loop to change the date stored as YYYY-MM-DD to DD-MM-YYYY
+    try:
+        dive_date = datetime.strptime(dive_log["dive_date"], "%Y-%m-%d")
+        dive_log["dive_date"] = dive_date.strftime("%d-%m-%Y")
+    except ValueError:
+        print("")
+
+    return render_template("entry.html", dive_log = dive_log, scuba_tanks=scuba_tanks, tank_volumes=tank_volumes)
+
 
 @app.route("/new", methods=["GET", "POST"])
 @login_required
 def new_entry():
+
+    dive_log = sql_select("SELECT * FROM entries WHERE diver_id = ?", (session["user_id"],)).fetchall()
+  
+    dive_count = len(dive_log)
+
+    #Auto-incrementing dive number to 'official' dive number
+    next_dive = (next_dive_number(dive_log, idx = -1))
+
     if request.method == "POST":
+        dive_number = request.form.get("dive_number")
         date = request.form.get("date")
         location = request.form.get("location")
         time_in = request.form.get("time_in")
@@ -163,22 +93,109 @@ def new_entry():
         max_depth = request.form.get("max_depth")
         avg_depth = request.form.get("avg_depth")
         visibility = request.form.get("visibility")
-        deco_dive = request.form.get("deco")
         tank_type = request.form.get("tank_type")
         in_pressure = request.form.get("in_pressure")
         out_pressure = request.form.get("out_pressure")
         water_temp = request.form.get("water_temp")
-        lead_weight = request.form.get("lead")
+        lead_weight = request.form.get("lead_weight")
         suit_type = request.form.get("suit_type")
         hood = request.form.get("hood")
-        wetsuit_thickness = request.form.get("thickness")
-        ds_undergarment = request.form.get("undergarment")
+        wetsuit_thickness = request.form.get("wetsuit_thickness")
+        ds_undergarment = request.form.get("ds_undergarment")
         buddy = request.form.get("buddy")
         dive_notes = request.form.get("notes")
 
-        dive_entry = [date, location, time_in, dive_time, max_depth, avg_depth, visibility, deco_dive, tank_type, in_pressure, out_pressure, water_temp, 
-            lead_weight, suit_type, hood, wetsuit_thickness, ds_undergarment, buddy, dive_notes]
+        dive_entry = [dive_number, date, location, time_in, dive_time, max_depth, avg_depth, visibility, tank_type, in_pressure, out_pressure, water_temp, 
+            lead_weight, suit_type, hood, wetsuit_thickness, ds_undergarment, buddy, dive_notes, session["user_id"]]
+        
 
+        #Check to see if anything was entered. Return error message if all fields were left blank.
+        if check_entry_validity(dive_entry) == False:
+            return apology("You need to fill out something for the dive to count!")
+        
+        #insert the new entry into the database
+        sql_insert("INSERT INTO entries"
+                       "(dive_number, dive_date, dive_location, time_in, dive_time, max_depth, avg_depth,"
+                       "visibility, tank_type, in_pressure, out_pressure, water_temp, lead_weight,"
+                       "suit_type, hood, wetsuit_thickness, ds_undergarment, buddy, dive_notes, diver_id)"
+                       "VALUES"
+                       "(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", dive_entry)
+        
+        return redirect("/")
+        
+    return render_template("new.html", dive_count=dive_count, next_dive=next_dive, scuba_tanks=scuba_tanks, tank_volumes=tank_volumes)
+
+
+@app.route("/editButton", methods=["POST"])
+@login_required
+def editBtn():
+
+    dive_id = request.form.get("id")
+
+    #making dive_log global so it can be called again in /edit route
+    global dive_log
+    dive_log = dive_id
+
+    entry = sql_select("SELECT * FROM entries WHERE diver_id = ? AND log_id = ?", (session["user_id"], dive_log)).fetchone()
+    dive_notes = entry["dive_notes"]
+
+    #The below in conjuction with edit.html javascript fixes the "javascript throws a Uncaught SyntaxError: "
+    #" string literal contains an unescaped line break error" because it's reading newline characters from sql.
+    dive_notes = dive_notes.replace("\r\n", "qtab")
+
+    return render_template("/edit.html", entry=entry, dive_notes=dive_notes, scuba_tanks=scuba_tanks)
+
+
+@app.route("/edit", methods=["POST"])
+@login_required
+def edit():
+
+    #Modify the existing entry using newly entered values. Update using the global dive_log number set above
+    dive_number = request.form.get("dive_number")
+    date = request.form.get("date")
+    location = request.form.get("location")
+    time_in = request.form.get("time_in")
+    dive_time = request.form.get("dive_time")
+    max_depth = request.form.get("max_depth")
+    avg_depth = request.form.get("avg_depth")
+    visibility = request.form.get("visibility")
+    tank_type = request.form.get("tank_type")
+    in_pressure = request.form.get("in_pressure")
+    out_pressure = request.form.get("out_pressure")
+    water_temp = request.form.get("water_temp")
+    lead_weight = request.form.get("lead_weight")
+    suit_type = request.form.get("suit_type")
+    hood = request.form.get("hood")
+    wetsuit_thickness = request.form.get("wetsuit_thickness")
+    ds_undergarment = request.form.get("ds_undergarment")
+    buddy = request.form.get("buddy")
+    dive_notes = request.form.get("notes")
+
+    dive_entry = [dive_number, date, location, time_in, dive_time, max_depth, avg_depth, visibility, tank_type, in_pressure, out_pressure, water_temp, 
+        lead_weight, suit_type, hood, wetsuit_thickness, ds_undergarment, buddy, dive_notes, session["user_id"], dive_log]    
+
+    #Check to see if anything was entered. Return error message if all fields were left blank.
+    if check_entry_validity(dive_entry) == False:
+        return apology("You need to fill out something for the dive to count!")
+
+    #insert the new entry into the database
+    sql_insert("UPDATE entries SET "
+                    "dive_number = ?, dive_date = ?, dive_location = ?, time_in = ?, dive_time = ?, max_depth = ?, avg_depth = ?,"
+                    "visibility = ?, tank_type = ?, in_pressure = ?, out_pressure = ?, water_temp = ?, lead_weight = ?,"
+                    "suit_type = ?, hood = ?, wetsuit_thickness = ?, ds_undergarment = ?, buddy = ?, dive_notes = ?, diver_id = ?"
+                    "WHERE log_id = ?", (dive_entry))
+    
+    return redirect("/")
+
+@app.route("/delButton", methods=["POST"])
+@login_required
+def delBtn():
+
+    dive_id = request.form.get("id")
+
+    sql_select("DELETE FROM entries WHERE diver_id = ? AND log_id = ?", (session["user_id"], dive_id)).fetchone()
+
+    return redirect("/")
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -194,7 +211,7 @@ def login():
             return apology("must provide username and/or password", 403)
 
         # Query database for username
-        entries = cursor.execute("SELECT * FROM users WHERE username = ?", (request.form.get("username"),)).fetchall()
+        entries = sql_select("SELECT * FROM users WHERE username = ?", (request.form.get("username"),)).fetchall()
 
         # Ensure username exists and password is correct
         if len(entries) != 1 or not check_password_hash(entries[0]["password_hash"], request.form.get("password")):
@@ -208,7 +225,9 @@ def login():
 
     # User reached route via GET (as by clicking a link or via redirect)
     else:
-        return render_template("login.html")
+        total_users = len(sql_select("SELECT * FROM users").fetchall())
+        logged_dives = len(sql_select("SELECT * FROM entries").fetchall())
+        return render_template("login.html", total_users = total_users, logged_dives = logged_dives)
 
 @app.route("/logout")
 def logout():
@@ -222,16 +241,17 @@ def logout():
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
-    """Register user"""
+    """Register user: This was copied from my CS50 - Finance codespace since it is essentially the same."""
 
     if request.method == "POST":
-        """Not saving input variables from form to minimise saving sensitive info into memory"""
+        """Not saving password variable from form to minimise saving sensitive info into memory"""
+        username = request.form.get("username")
 
         #get list of usernames to compare if username aleady in database
-        users_list = cursor.execute("SELECT username FROM users WHERE username = ?", (request.form.get("username"),)).fetchall()
+        users_list = sql_select("SELECT username FROM users WHERE username = ?", (username,)).fetchall()
 
         #check to see if both username and password were entered
-        if not request.form.get("username") or not request.form.get("password"):
+        if not username or not request.form.get("password"):
             return apology("must provide username and/or password")
 
         #check to see if the password and confirmation password match
@@ -245,7 +265,13 @@ def register():
         #else generate account and insert into database
         else:
             password_hash = generate_password_hash(request.form.get("password"))
-            cursor.execute("INSERT INTO users (username, password_hash) VALUES (?, ?)", (request.form.get("username"), password_hash))
+            user_details = [username, password_hash]
+            sql_insert("INSERT INTO users (username, password_hash) VALUES (?, ?)", user_details)
+
+            entries = sql_select("SELECT * FROM users where username = ?", (username,)).fetchone()
+            
+            # Remember user so login occurs automatically
+            session["user_id"] = entries["user_id"]
             return redirect("/", )
 
     else:

@@ -1,0 +1,73 @@
+h1 {
+    text-align: center;
+}
+
+.myNotes {
+    height:200px;
+}
+
+.viewNotes {
+    width:550px;
+    margin:auto;
+}
+
+.smallText {
+    width:100px
+}
+
+h4 {
+    text-align: center;
+    font-size: 18px;
+}
+
+.container {
+    background-color: #ffffff;  
+    margin:auto;
+    width:80%;
+ }
+
+ .containerTable {
+    margin:auto;
+    width:64%;
+    background-color: #ffffff;
+ }
+
+ .navbar {
+    margin:auto;
+    width:52%;
+    text-align: center;
+ }
+
+ .fit {
+    width:87%;
+ }
+
+ .child {
+    margin: 0 auto;
+ }
+ 
+ .content {
+    text-align: center; 
+    width: auto;
+ }
+ 
+ .labels {
+    text-align: left;
+    font-weight: bold;
+ }
+
+ .text {
+    text-align: left;
+    font-weight: normal;
+ }
+
+ .center {
+    margin-left: auto;
+    margin-right: auto;
+ }
+
+ .img_center {
+   display: block;
+   margin-left: auto;
+   margin-right: auto;
+ }
