@@ -68,6 +68,47 @@ def dict_factory(cursor, row):
     fields = [column[0] for column in cursor.description]
     return {key: value for key, value in zip(fields, row)}
 
+#the below function opens a connection and creates the necessary tables in the database
+def sql_init():
+    try:
+        with sqlite3.connect("ezdive.db") as connection:
+            cursor = connection.cursor()
+            cursor.execute("""CREATE TABLE IF NOT EXISTS users (
+                            user_id	INTEGER,
+                            username	TEXT NOT NULL,
+                            password_hash	TEXT NOT NULL,
+                            PRIMARY KEY(user_id AUTOINCREMENT)
+                            )""")
+            
+            cursor.execute("""CREATE TABLE IF NOT EXISTS entries (
+                            log_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                            dive_number TEXT,
+                            dive_date TEXT,
+                            dive_location TEXT,
+                            time_in TEXT,
+                            dive_time REAL,
+                            max_depth REAL,
+                            avg_depth REAL,
+                            visibility TEXT,
+                            tank_type TEXT,
+                            in_pressure REAL,
+                            out_pressure REAL,
+                            water_temp REAL,
+                            lead_weight TEXT,
+                            hood TEXT,
+                            wetsuit_thickness TEXT,
+                            ds_undergarment TEXT,
+                            buddy TEXT,
+                            dive_notes TEXT,
+                            diver_id INTEGER NOT NULL, 
+                            suit_type TEXT,
+                            FOREIGN KEY (diver_id) REFERENCES users (user_id)
+                            )""")
+            connection.commit()
+            return
+    except Error as e:
+        print(f"Error encountered: {e}")
+
 #The below function opens a connection only to execute the statement and then closes the connection
 def sql_select(query, user = None):
     try:
