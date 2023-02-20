@@ -1,7 +1,7 @@
 # EzDive
 ## A simple scuba logbook
 
-#### Video Demo: 
+#### Video Demo: https://youtu.be/q2Ong5zByLs
 #### Description:
 
 I am a passionate scuba diver and thought that for my CS50 final project, I'd make a "simple" dive logging web-app. 

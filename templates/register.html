@@ -2,10 +2,12 @@
 {% block title %} Register {% endblock %}
 {% block body %}
 <h1>Register a new account</h1>
+<div class="container">
     <form action="/register" method="post">
         <input autocomplete="off" autofocus class="form-control mx-auto w-auto" name="username" placeholder="Username" type="text">
         <input autocomplete="off" class="form-control mx-auto w-auto" name="password" placeholder="Password" type="password">
         <input autocomplete="off" class="form-control mx-auto w-auto" name="confirmation" placeholder="Re-enter password" type="password">
-        <button type="submit">Register</button>
+        <button type="submit" class="form-control mx-auto w-auto">Register</button>
     </form>
+</div>
 {% endblock %}

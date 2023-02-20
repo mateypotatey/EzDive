@@ -82,7 +82,10 @@ def new_entry():
     dive_count = len(dive_log)
 
     #Auto-incrementing dive number to 'official' dive number
-    next_dive = (next_dive_number(dive_log, idx = -1))
+    if dive_count == 0:
+        next_dive = 1
+    else:
+        next_dive = (next_dive_number(dive_log, idx = -1))
 
     if request.method == "POST":
         dive_number = request.form.get("dive_number")
