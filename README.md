@@ -1,6 +1,10 @@
 # EzDive
 ## A simple scuba logbook
 
+#### Installation requirements:
+Flask
+flask_session
+
 #### Video Demo: https://youtu.be/q2Ong5zByLs
 #### Description:
 
