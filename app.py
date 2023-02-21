@@ -83,10 +83,7 @@ def new_entry():
 
     #Auto-incrementing dive number to 'official' dive number
     try:
-        if dive_count == 0:
-            next_dive = 1
-        else:
-            next_dive = (next_dive_number(dive_log, idx = -1))
+        next_dive = (next_dive_number(dive_log, idx = -1))
     except IndexError:
         next_dive = 1
 
